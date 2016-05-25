@@ -1,9 +1,39 @@
+# ignore everything
+*
+
+# Don't ignore git settings
+!*.gitignore
+!*.gitattributes
+
+# Don't ignore subdirectories
+!*/
+
+# Don't ignore source files, etc
+!*.py
+
+# don't ignore HTML/CSS/JS etc
+!*.html
+!*.js
+!*.css
+!*.json
+
+# Don't ignore fonts
+!*.svg
+!*.eot
+!*.woff
+!*.woff2
+!*.ttf
+
 .DS_Store
 data/
 
 # Logs
 logs
 *.log
+
+# Output files
+logs
+*.out
 
 # Runtime data
 pids
