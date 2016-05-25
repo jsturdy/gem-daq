@@ -188,6 +188,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     $scope.reads = function() {  
         $scope.readsResult = [];
         var mask = parseInt($scope.vfat2sMask, 16);
+        console.log("popcount("+mask+") = "+popcount(mask));
         var nReads = 24 - popcount(mask);
         socket.ipbus_write(oh_ei2c_reg(OHID, 256), mask);
         socket.ipbus_read(oh_ei2c_reg(OHID, $scope.vfat2sRegister.id));
