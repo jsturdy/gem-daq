@@ -7,7 +7,7 @@
 <div>
     <h1>OptoHybrid monitoring and control</h1>
     <div class="row">
-        <div class="col-md-12">   
+        <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Help</h3>
@@ -18,7 +18,7 @@
                     <div class="alert alert-danger" ng-show="t1Source.id != 1">The <b>VFAT2 trigger source</b> register should be set to "OptoHybrid"! <a class="btn btn-xs btn-success pull-right" ng-click="solve_trigger()">Solve</a></div>
                     <div class="alert alert-danger" ng-show="clockSource.id != 0">The <b>Clock source</b> register should be set to "Allow clock switch"! <a class="btn btn-xs btn-success pull-right" ng-click="solve_clock()">Solve</a></div>
                 </div>
-            </div>   
+            </div>
         </div>
     </div>
     <div class="row">
@@ -34,66 +34,72 @@
                             <div class="form-horizontal">
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">VFAT2 mask</label>
-                                    <div class="col-sm-8">   
+                                    <div class="col-sm-8">
                                         <div class="input-group">
                                             <div class="input-group-addon">0x</div>
                                             <input type="text" maxlength="6" class="form-control" ng-model="vfat2sMask">
                                         </div>
                                     </div>
-                                </div>  
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">VFAT2 trigger source</label>
-                                    <div class="col-sm-8">   
+                                    <div class="col-sm-8">
                                         <select class="form-control" ng-model="t1Source" ng-options="item.name for item in t1SourceChoices track by item.id"></select>
                                     </div>
-                                </div>  
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">Loopback trigger source</label>
-                                    <div class="col-sm-8">   
+                                    <div class="col-sm-8">
                                         <input type="text" maxlength="2" min="0" max="23" class="form-control" ng-model="loopbackSource">
                                     </div>
-                                </div>  
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">Clock source</label>
-                                    <div class="col-sm-8">   
+                                    <div class="col-sm-8">
                                         <select class="form-control" ng-model="clockSource" ng-options="item.name for item in clockSourceChoices track by item.id"></select>
                                     </div>
-                                </div>  
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label">Trigger Throttling</label>
-                                    <div class="col-sm-8">   
+                                    <div class="col-sm-8">
                                         <input type="number" class="form-control" ng-model="triggerThrottling">
                                     </div>
-                                </div>  
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-4 control-label"></label>
-                                    <div class="col-sm-8">   
+                                    <div class="col-sm-8">
                                         <a class="btn btn-success btn-xs" ng-click="set_system_regs()">Apply changes</a>
                                     </div>
-                                </div>  
+                                </div>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">TDC SBit outputs</label>
-                                    <div class="col-sm-8">   
-                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[0]">
-                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[1]">
-                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[2]">
-                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[3]">
-                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[4]">
-                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[5]">
+                                    <label class="col-sm-4 control-label">TDC SBit mode</label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="sbitMode" ng-options="item.name for item in sbitModeChoices track by item.id"></select>
                                     </div>
-                                </div>  
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">TDC SBit outputs</label>
+                                    <div class="col-sm-8">
+                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[0]" ng-disabled="sbitMode.id >= 2">
+                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[1]" ng-disabled="sbitMode.id >= 2">
+                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[2]" ng-disabled="sbitMode.id >= 2">
+                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[3]" ng-disabled="sbitMode.id >= 2">
+                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[4]" ng-disabled="sbitMode.id >= 2">
+                                        <input type="number" min="0" max="23" class="form-control" ng-model="sbitSelect[5]" ng-disabled="sbitMode.id >= 2">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>            
+            </div>
         </div>
         <div class="col-md-4">
-            <!-- Status regs --> 
+            <!-- Status regs -->
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Status registers</h3>
@@ -114,7 +120,7 @@
                         </tbody>
                     </table>
                 </div>
-            </div>   
+            </div>
         </div>
     </div>
     <div class="row">
@@ -144,8 +150,8 @@
                     <hr>
                     <p><a class="btn btn-primary btn-xs btn-block" ng-click="reset_wb_counters()">Reset the counters</a></p>
                 </div>
-            </div>           
-        </div>             
+            </div>
+        </div>
         <div class="col-md-4">
             <!-- T1 counters -->
             <div class="panel panel-default">
@@ -170,8 +176,8 @@
                     <hr>
                     <p><a class="btn btn-primary btn-xs btn-block" ng-click="reset_t1_counters()">Reset the counters</a></p>
                 </div>
-            </div>           
-        </div>       
+            </div>
+        </div>
         <div class="col-md-4">
             <!-- GTX counters -->
             <div class="panel panel-default">
@@ -196,8 +202,8 @@
                     <hr>
                     <p><a class="btn btn-primary btn-xs btn-block" ng-click="reset_gtx_counters()">Reset the counters</a></p>
                 </div>
-            </div>           
-        </div>   
+            </div>
+        </div>
     </div>
 </div>
 
