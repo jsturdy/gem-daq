@@ -1,34 +1,27 @@
 var fs = require('fs');
 
+// UDP
 var dgram = require('dgram');
 var udp = dgram.createSocket('udp4');
+// TCP
+var net = require('net');
+var client = new net.Socket();
 
-var ipaddr = "192.168.0.162";
+var useUDP = true;
+var ipaddr = "192.168.2.42";
 var port = 50001;
-
+if (useUDP == true) {
+    port = 60002;
+}
 var packets = new Array();
 var packet = undefined;
 var packetId = 0;
-
-
-udp.bind();
-
-/*
- * Send transactions
- */
-
-setInterval(function() {
-    if (packet === undefined && packets.length > 0) {
-        packet = packets.shift();
-        udp.send(packet.data, 0, packet.data.length, port, ipaddr);
-    }
-}, 1);
 
 /*
  * Receive transactions
  */
 
-udp.on('message', function(message) {
+function handleResponse(message) {
     // Response
     var response = {
         ipbusVersion: (message[0] >> 4),
@@ -54,7 +47,28 @@ udp.on('message', function(message) {
         packet = undefined;
     }
     else console.log('UDP: received packet', response.id, 'but NO callback :(');
-});
+}
+
+if (useUDP) {
+    udp.bind();
+    udp.on('message', handleResponse);
+}
+else {
+    client.connect(port, ipaddr, function() { console.log('Connected to CTP7'); });
+    client.on('data', handleResponse);
+}
+
+/*
+ * Send transactions
+ */
+
+setInterval(function() {
+    if (packet === undefined && packets.length > 0) {
+        packet = packets.shift();
+        if (useUDP) udp.send(packet.data, 0, packet.data.length, port, ipaddr);
+        else client.write(packet.data);
+    }
+}, 1);
 
 /*
  * Handle timeouts
