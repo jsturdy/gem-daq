@@ -32,7 +32,6 @@ logs
 *.log
 
 # Output files
-logs
 *.out
 
 # Runtime data
