@@ -24,50 +24,62 @@ WEBDAQROOT=/data/bigdisk/users/sturdy/software/gem-daq/web-daq
 
 export HOME=$WEBDAQROOT
 
-# Default LD_LIBRARY_PATH
-# Can be overridden in the package .conf files
-#
-LD_LIBRARY_PATH=${WEBDAQROOT}/lib
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# exec="/path/to/<daemonname>"
+# prog="<service name>"
+# config="<path to major config file>"
+
+# [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+
+# lockfile=$(eval "'print /var/lock/subsys/$prog-slot%02d' '$2'"
 
 nodeinstance=$(eval "printf 'app_slot%02d.js' '$2'")
 nodeproc=$(eval "printf 'slot%02d' '$2'")
 nodepid=$(ps -ef|fgrep node|fgrep $nodeinstance|awk '{print $2}')
+logfile=$(eval "printf '/var/log/gemdaq/web-daq/slot%02d.out' '$2'")
+
+touch $logfile
+
+echo $0 $1 $2 >> $logfile
+echo date --utc >> $logfile
+echo "#######################################################" >> $logfile
 
 start() {
-
     if [ -n "$nodepid" ]
     then
-	echo "#######################################################"
 	echo "web-daq on $nodeproc is running with pid $nodepid"
 	echo "Stop first, or restart!"
-	echo "#######################################################"
     else
 	cd ${WEBDAQROOT}
-	logfile=$(eval "printf '/var/log/gemdaq/web-daq/slot%02d.out' '$1'")
-	cmd=$(eval "printf 'node app_slot%02d.js >& $logfile&\n' '$1'")
+	cmd="printf 'node app_slot%02d.js >> $logfile 2>&1 &\n' '$1'"
 
-	echo "#######################################################"
+	echo "starting web-daq on $nodeproc and logging to $logfile" >> $logfile
 	echo "starting web-daq on $nodeproc and logging to $logfile"
-	echo "su - gemuser -c $cmd"
-	echo "#######################################################"
-	su - gemuser -c $cmd
+	#echo "su gemuser -c '$cmd'"
+	echo $(eval "$cmd") >> $logfile
+	$(eval $cmd) &
+	RETVAL=$?
+	return $RETVAL
     fi
+    return 0
 }
 
 stop() {
-    echo 
     if [ -n "$nodepid" ]
     then
-	echo "#######################################################"
+	echo "killing web-daq on $nodeproc is running with pid $nodepid" >> $logfile
 	echo "killing web-daq on $nodeproc is running with pid $nodepid"
-	echo "su - gemuser -c kill $nodepid"
-	echo "#######################################################"
-	su - gemuser -c kill $nodepid
-    else                
-	echo "#######################################################"
+	echo "kill $nodepid" >> $logfile
+	kill $nodepid
+	RETVAL=$?
+	return $RETVAL
+    else
 	echo "web-daq on $nodeproc is not running"
-	echo "#######################################################"
     fi
+    return 0
 }
 
 restart() {
@@ -78,52 +90,55 @@ restart() {
 status() {
     if [ -n "$nodepid" ]
     then
-	echo "#######################################################"
+	echo "web-daq on $nodeproc is running with pid $nodepid" >> $logfile
 	echo "web-daq on $nodeproc is running with pid $nodepid"
-	echo "#######################################################"
-    else                
-	echo "#######################################################"
+    else
+	echo "web-daq on $nodeproc is not running" >> $logfile
 	echo "web-daq on $nodeproc is not running"
-	echo "#######################################################"
     fi
+    return 0
 }
 
 info() {
     nodepids=$(ps -ef|fgrep node|fgrep slot|awk '{print $1 " " $2 " " $9}')
     if [ -n "$nodepids" ]
     then
-	echo "#######################################################"
 	echo "Currently running web-daq processes:"
-	for ((i=0;i<${#nodepids[*]};i++)); do
+	for ((i=0;i<${#nodepids[*]};i++))
+	do
 	    echo "${nodepids[$i]}"
 	done
-	echo "#######################################################"
-    else                
-	echo "#######################################################"
+    else
 	echo "No web-daq process is running"
-	echo "#######################################################"
     fi
+    return 0
 }
 
 case "$1" in
     'start')
 	start $2
+	RETVAL=$?
 	;;
     'stop')
 	stop $2
+	RETVAL=$?
 	;;
     'restart')
 	restart $2
+	RETVAL=$?
 	;;
     'status')
 	status $2
+	RETVAL=$?
 	;;
     'info')
 	info
+	RETVAL=$?
 	;;
     *)
     # usage
-	echo "Usage: $0 start|stop|restart|status <slot number>"
-	;;
+	echo "Usage: $0 start|stop|restart|status <slot number> or info"
+	exit 1
 esac
+echo "#######################################################" >> $logfile
 
