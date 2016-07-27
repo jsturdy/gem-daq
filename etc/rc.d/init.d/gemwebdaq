@@ -29,27 +29,44 @@ export HOME=$WEBDAQROOT
 #
 LD_LIBRARY_PATH=${WEBDAQROOT}/lib
 
+nodeinstance=$(eval "printf 'app_slot%02d.js' '$2'")
+nodeproc=$(eval "printf 'slot%02d' '$2'")
+nodepid=$(ps -ef|fgrep node|fgrep $nodeinstance|awk '{print $2}')
+
 start() {
-    cd ${WEBDAQROOT}
-    logfile=$(eval "printf '/var/log/gemdaq/web-daq/slot%02d.out' '$1'")
-    nodeproc=$(eval "printf 'slot%02d' '$1'")
-    cmd=$(eval "printf 'node app_slot%02d.js >& $logfile&\n' '$1'")
-    echo "starting web-daq on $nodeproc and logging to $logfile"
-    echo "$cmd"
-    $(eval $cmd)
+
+    if [ -n "$nodepid" ]
+    then
+	echo "#######################################################"
+	echo "web-daq on $nodeproc is running with pid $nodepid"
+	echo "Stop first, or restart!"
+	echo "#######################################################"
+    else
+	cd ${WEBDAQROOT}
+	logfile=$(eval "printf '/var/log/gemdaq/web-daq/slot%02d.out' '$1'")
+	cmd=$(eval "printf 'node app_slot%02d.js >& $logfile&\n' '$1'")
+
+	echo "#######################################################"
+	echo "starting web-daq on $nodeproc and logging to $logfile"
+	echo "su - gemuser -c $cmd"
+	echo "#######################################################"
+	su - gemuser -c $cmd
+    fi
 }
 
 stop() {
-    nodeinstance="printf 'app_slot%02d.js' '$1'"
-    nodeproc="printf 'slot%02d' '$1'"
-    nodepid=$(ps aux www|fgrep node|fgrep $(eval $nodeinstance)|awk '{print $2}')
     echo 
     if [ -n "$nodepid" ]
     then
-	echo "killing web-daq on $(eval $nodeproc) is running with pid $nodepid"
-	kill $nodepid
+	echo "#######################################################"
+	echo "killing web-daq on $nodeproc is running with pid $nodepid"
+	echo "su - gemuser -c kill $nodepid"
+	echo "#######################################################"
+	su - gemuser -c kill $nodepid
     else                
-	echo "web-daq on $(eval $nodeproc) is not running"
+	echo "#######################################################"
+	echo "web-daq on $nodeproc is not running"
+	echo "#######################################################"
     fi
 }
 
@@ -59,15 +76,32 @@ restart() {
 }
 
 status() {
-    nodeinstance="printf 'app_slot%02d.js' '$1'"
-    nodeproc="printf 'slot%02d' '$1'"
-    nodepid=$(ps aux www|fgrep node|fgrep $(eval $nodeinstance)|awk '{print $2}')
-
     if [ -n "$nodepid" ]
     then
-	echo "web-daq on $(eval $nodeproc) is running with pid $nodepid"
+	echo "#######################################################"
+	echo "web-daq on $nodeproc is running with pid $nodepid"
+	echo "#######################################################"
     else                
-	echo "web-daq on $(eval $nodeproc) is not running"
+	echo "#######################################################"
+	echo "web-daq on $nodeproc is not running"
+	echo "#######################################################"
+    fi
+}
+
+info() {
+    nodepids=$(ps -ef|fgrep node|fgrep slot|awk '{print $1 " " $2 " " $9}')
+    if [ -n "$nodepids" ]
+    then
+	echo "#######################################################"
+	echo "Currently running web-daq processes:"
+	for ((i=0;i<${#nodepids[*]};i++)); do
+	    echo "${nodepids[$i]}"
+	done
+	echo "#######################################################"
+    else                
+	echo "#######################################################"
+	echo "No web-daq process is running"
+	echo "#######################################################"
     fi
 }
 
@@ -83,6 +117,9 @@ case "$1" in
 	;;
     'status')
 	status $2
+	;;
+    'info')
+	info
 	;;
     *)
     # usage
