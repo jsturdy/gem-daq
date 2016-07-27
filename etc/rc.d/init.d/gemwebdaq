@@ -7,15 +7,17 @@
 #              to the GEM DAQ hardware
 #              This service starts up the web-daq server daemon.
 #
-#              Logging setup to:
-# 
-#              sudo mkdir -p /var/log/gemdaq/web-daq
-#              sudo chgrp gemuser -R /var/log/gemdaq
-#              sudo chmod g+s /var/log/gemdaq
-#              sudo chmod g+s /var/log/gemdaq/web-daq
-#              find /var/log/gemdaq -type d |xargs -n1 sudo chmod ag+rx
-#              find /var/log/gemdaq -type d |xargs -n1 sudo chmod g+w
-#              sudo chgrp gemuser /var/log/gemdaq/web-daq/*.out
+#              Logging setup to: /var/log/gemdaq/web-daq
+#
+#              Should set this up with an rpm
+#               - sudo mkdir -p /var/log/gemdaq/web-daq
+#               - sudo chgrp gemuser -R /var/log/gemdaq
+#               - sudo chmod g+s /var/log/gemdaq
+#               - sudo chmod g+s /var/log/gemdaq/web-daq
+#               - find /var/log/gemdaq -type d |xargs -n1 sudo chmod ag+rx
+#               - find /var/log/gemdaq -type d |xargs -n1 sudo chmod g+w
+#               - sudo chgrp gemuser /var/log/gemdaq/web-daq/*.out
+#               - sudo chkconfig --add gemwebdaq
 # 
 # processname: gemwebdaq
 
@@ -30,14 +32,15 @@
 #
 ### END INIT INFO
 
+# should set this up with RPM and a system installation
 WEBDAQROOT=/data/bigdisk/users/sturdy/software/gem-daq/web-daq
 
 export HOME=$WEBDAQROOT
 
-
 # Source function library.
 . /etc/rc.d/init.d/functions
 
+# should figure out how to daemonize better
 # exec="/path/to/<daemonname>"
 # prog="<service name>"
 # config="<path to major config file>"
