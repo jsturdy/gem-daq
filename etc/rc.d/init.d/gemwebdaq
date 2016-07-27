@@ -7,6 +7,16 @@
 #              to the GEM DAQ hardware
 #              This service starts up the web-daq server daemon.
 #
+#              Logging setup to:
+# 
+#              sudo mkdir -p /var/log/gemdaq/web-daq
+#              sudo chgrp gemuser -R /var/log/gemdaq
+#              sudo chmod g+s /var/log/gemdaq
+#              sudo chmod g+s /var/log/gemdaq/web-daq
+#              find /var/log/gemdaq -type d |xargs -n1 sudo chmod ag+rx
+#              find /var/log/gemdaq -type d |xargs -n1 sudo chmod g+w
+#              sudo chgrp gemuser /var/log/gemdaq/web-daq/*.out
+# 
 # processname: gemwebdaq
 
 ### BEGIN INIT INFO
