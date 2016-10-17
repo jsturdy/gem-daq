@@ -4,13 +4,13 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
 
     $scope.t1SourceChoices = [
         { name: "AMC13 over GTX", id: 0},
-        { name: "AMC13 over GBT", id: 5},
-        { name: "AMC13 over GTX or GBT", id: 6},
         { name: "OptoHybrid (Internal)", id: 1},
         { name: "External", id: 2},
-        { name: "OptoHybrid or External", id: 7},
         { name: "Loopback", id: 3},
-        { name: "All", id: 4}
+        { name: "All", id: 4},
+        { name: "AMC13 over GBT", id: 5},
+        { name: "AMC13 over GTX or GBT", id: 6},
+        { name: "OptoHybrid or External", id: 7}
     ];
 
     $scope.t1Source = 0;
