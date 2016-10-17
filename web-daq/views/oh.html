@@ -15,8 +15,6 @@
                 <div class="panel-body">
                     <p>The ORANGE warnings on this page are not critical and do not prevent the system from running. They can be ignored. However, do not reset the counters unless the system has been restarted. This information will help the developers to stabilize the system.</p>
                     <p>The RED warnings indicate that the values read from or written in the system are not the optimal values for data taking. In case you plan on performing a data taking run, all RED warnings should be resolved before the start of the run.</p>
-                    <div class="alert alert-danger" ng-show="t1Source.id != 1">The <b>VFAT2 trigger source</b> register should be set to "OptoHybrid"! <a class="btn btn-xs btn-success pull-right" ng-click="solve_trigger()">Solve</a></div>
-                    <div class="alert alert-danger" ng-show="clockSource.id != 0">The <b>Clock source</b> register should be set to "Allow clock switch"! <a class="btn btn-xs btn-success pull-right" ng-click="solve_clock()">Solve</a></div>
                 </div>
             </div>
         </div>
@@ -33,11 +31,20 @@
                         <div class="col-sm-6">
                             <div class="form-horizontal">
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">VFAT2 mask</label>
+                                    <label class="col-sm-4 control-label">VFAT2 tracking mask</label>
                                     <div class="col-sm-8">
                                         <div class="input-group">
                                             <div class="input-group-addon">0x</div>
                                             <input type="text" maxlength="6" class="form-control" ng-model="vfat2sMask">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">VFAT2 trigger mask</label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group">
+                                            <div class="input-group-addon">0x</div>
+                                            <input type="text" maxlength="6" class="form-control" ng-model="sbitsMask">
                                         </div>
                                     </div>
                                 </div>
@@ -51,12 +58,6 @@
                                     <label class="col-sm-4 control-label">Loopback trigger source</label>
                                     <div class="col-sm-8">
                                         <input type="text" maxlength="2" min="0" max="23" class="form-control" ng-model="loopbackSource">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="col-sm-4 control-label">Clock source</label>
-                                    <div class="col-sm-8">
-                                        <select class="form-control" ng-model="clockSource" ng-options="item.name for item in clockSourceChoices track by item.id"></select>
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -182,7 +183,7 @@
             <!-- GTX counters -->
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">GTX error counters</h3>
+                    <h3 class="panel-title">GBT and GTX error counters</h3>
                 </div>
                 <div class="panel-body">
                     <table class="table">
