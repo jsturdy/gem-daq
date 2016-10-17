@@ -1,4 +1,4 @@
-app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, socket, Notification) {    
+app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, socket, Notification) {
 
     var OHID = (window.sessionStorage.OHID == undefined ? 0 : parseInt(window.sessionStorage.OHID));
 
@@ -14,7 +14,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
         { name: "Latency scan", id: 2 },
         { name: "S-Curve scan", id: 3 }
     ];
-    
+
     $scope.scanStatus = 0;
 
     $scope.type = $scope.types[0];
@@ -30,34 +30,34 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     $scope.steps = 1;
 
     $scope.nEvents = 0xFFFFFF;
-        
+
     function get_current_values() {
-        socket.ipbus_blockRead(oh_scan_reg(OHID, 1), 7, function(data) { 
+        socket.ipbus_blockRead(oh_scan_reg(OHID, 1), 7, function(data) {
             $scope.type = $scope.types[data[0]];
             $scope.vfat2 = data[1];
             $scope.channel = data[2];
             $scope.minVal = data[3];
             $scope.maxVal = data[4];
             $scope.steps = data[5];
-            $scope.nEvents = data[6]; 
-        });    
+            $scope.nEvents = data[6];
+        });
     }
 
     get_current_values();
 
-    $scope.start_scan = function() {   
+    $scope.start_scan = function() {
         socket.ipbus_blockWrite(oh_scan_reg(OHID, 1), [ $scope.type.id, $scope.vfat2, $scope.channel, $scope.minVal, $scope.maxVal, $scope.steps, $scope.nEvents ]);
-        socket.ipbus_write(oh_scan_reg(OHID, 0), 1);  
-        $scope.scanStatus = 1; 
+        socket.ipbus_write(oh_scan_reg(OHID, 0), 1);
+        $scope.scanStatus = 1;
         check_results();
     };
-        
+
     function check_results() {
-        socket.ipbus_read(oh_scan_reg(OHID, 9), function(data) { 
+        socket.ipbus_read(oh_scan_reg(OHID, 9), function(data) {
             $scope.scanStatus = (data == 0 ? 2 : 1);
-            if ($scope.scanStatus == 2) plot_results(); 
+            if ($scope.scanStatus == 2) plot_results();
             else setTimeout(check_results, 500);
-        });    
+        });
     };
 
     $scope.reset_scan = function() {
@@ -89,7 +89,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
             legend: {
                 position: 'none'
             }
-        };  
+        };
 
         socket.ipbus_fifoRead(oh_scan_reg(OHID, 8), nSamples, function(data) {
             saveData = data;
@@ -98,11 +98,11 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
         });
     };
 
-    function selectHandler() { 
-        if ($scope.type.id == 0 || $scope.type == 1) socket.ipbus_write(vfat2_reg(OHID, $scope.vfat2, 146), chart.getSelection()[0].row, function() { Notification.primary('The threshold\'s value has been updated'); });
-        else if ($scope.type.id == 2) socket.ipbus_write(vfat2_reg(OHID, $scope.vfat2, 16), chart.getSelection()[0].row, function() { Notification.primary('The latency\'s value has been updated'); });
-        else if ($scope.type.id == 3) socket.ipbus_write(vfat2_reg(OHID, $scope.vfat2, 145), chart.getSelection()[0].row, function() { Notification.primary('The calibration pulse\'s value has been updated'); });
-    }  
+    function selectHandler() {
+        if ($scope.type.id == 0 || $scope.type == 1) socket.ipbus_write(vfat2_reg(OHID, $scope.vfat2, 146), chart.getSelection()[0].row + $scope.minVal, function() { Notification.primary('The threshold\'s value has been updated'); });
+        else if ($scope.type.id == 2) socket.ipbus_write(vfat2_reg(OHID, $scope.vfat2, 16), chart.getSelection()[0].row + $scope.minVal, function() { Notification.primary('The latency\'s value has been updated'); });
+        else if ($scope.type.id == 3) socket.ipbus_write(vfat2_reg(OHID, $scope.vfat2, 145), chart.getSelection()[0].row + $scope.minVal, function() { Notification.primary('The calibration pulse\'s value has been updated'); });
+    }
 
     $scope.save = function() {
         if ($scope.type.id == 0) var type = 'threshold';
@@ -111,8 +111,8 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
         else if ($scope.type.id == 3) var type = 'scurve';
 
         socket.save({
-                type: type, 
-                data: saveData, 
+                type: type,
+                data: saveData,
                 oh: OHID,
                 vfat2: $scope.vfat2,
                 channel: $scope.channel,
