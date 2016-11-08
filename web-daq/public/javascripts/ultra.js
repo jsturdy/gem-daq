@@ -2,10 +2,9 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
 
     var OHID = (window.sessionStorage.OHID == undefined ? 0 : parseInt(window.sessionStorage.OHID));
 
-    var chart = new google.visualization.LineChart(document.getElementById('chart'));
-    google.visualization.events.addListener(chart, 'select', selectHandler);
+    var charts = [ ];
 
-    var saveData = [];
+    for (var i = 0; i < 24; ++i) charts.push(new google.visualization.LineChart(document.getElementById('chart'+i)));
 
     $scope.types = [
         { name: "Threshold scan", id: 0 },
@@ -48,19 +47,23 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     get_current_values();
 
     $scope.start_scan = function() {
-        socket.ipbus_blockWrite(oh_ultra_reg(OHID, 1), [ $scope.type.id, $scope.mask, $scope.channel, $scope.minVal, $scope.maxVal, $scope.steps, $scope.nEvents ]);
+        socket.ipbus_blockWrite(oh_ultra_reg(OHID, 1), [ $scope.type.id, parseInt($scope.mask, 16), $scope.channel, $scope.minVal, $scope.maxVal, $scope.steps, $scope.nEvents ]);
         socket.ipbus_write(oh_ultra_reg(OHID, 0), 1);
         $scope.scanStatus = 1;
         check_results();
     };
 
+    $scope.read_scan = function() {
+      plot_results();
+    };
+
     function check_results() {
-        socket.ipbus_read(oh_ultra_reg(OHID, 9), function(data) {
+        socket.ipbus_read(oh_ultra_reg(OHID, 32), function(data) {
             $scope.scanStatus = (data == 0 ? 2 : 1);
+            var mask = parseInt($scope.mask, 16);
             if ($scope.scanStatus == 2) {
-                var mask = parseInt($scope.mask, 16);
                 for (var i = 0; i < 24; ++i) {
-                    if (((mask >> 0) & 0x1) == 1) plot_results(i);
+                  if (((mask >> i) & 0x1) == 0) plot_results(i);
                 }
             }
             else setTimeout(check_results, 500);
@@ -68,21 +71,22 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     };
 
     $scope.reset_scan = function() {
-        socket.ipbus_write(oh_ultra_reg(OHID, 10), 1, function() { Notification.primary('The module has been reset'); });
+        socket.ipbus_write(oh_ultra_reg(OHID, 33), 1, function() { Notification.primary('The module has been reset'); });
         get_current_values();
     };
 
-    function plot_results(i) {
-        var nSamples = $scope.maxVal - $scope.minVal;
+    function plot_results(vfat2) {
+        var nSamples = $scope.maxVal - $scope.minVal + 1;
 
         var chartData = new google.visualization.DataTable();
         chartData.addColumn('number', 'X');
         chartData.addColumn('number', 'Percentage');
 
-        if ($scope.type == 0) var title = 'Threshold scan of VFAT2 #' + i;
-        else if ($scope.type == 1) var title = 'Threshold scan by channel of VFAT2 #' + i;
-        else if ($scope.type == 2) var title = 'Latency scan of VFAT2 #' + i;
-        else if ($scope.type == 3) var title = 'S-Curve scan of VFAT2 #' + i;
+        if ($scope.type.id == 0) var title = 'Threshold scan of VFAT2 #' + vfat2;
+        else if ($scope.type.id == 1) var title = 'Threshold scan by channel of VFAT2 #' + vfat2;
+        else if ($scope.type.id == 2) var title = 'Latency scan of VFAT2 #' + vfat2;
+        else if ($scope.type.id == 3) var title = 'S-Curve scan of VFAT2 #' + vfat2;
+        else if ($scope.type.id == 4) var title = 'Threshold scan (TK data) of VFAT2 #' + vfat2;
 
         var options = {
             title: title,
@@ -98,11 +102,10 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
             }
         };
 
-        socket.ipbus_fifoRead(oh_ultra_reg(OHID, 8 + i), nSamples, function(data) {
-            saveData = data;
-            for (var i = 0; i < data.length; ++i) chartData.addRow([ (data[i] >> 24) & 0xFF, (data[i] & 0x00FFFFFF) / (1. * $scope.nEvents) * 100 ]);
-            chart.draw(chartData, options);
+        socket.ipbus_fifoRead(oh_ultra_reg(OHID, 8 + vfat2), nSamples, function(data) {
+            for (var i = 0; i < data.length; ++i) chartData.addRow([ (data[vfat2] >> 24) & 0xFF, (data[vfat2] & 0x00FFFFFF) / (1. * $scope.nEvents) * 100 ]);
+            charts[vfat2].draw(chartData, options);
         });
-    }
+    };
 
 }]);

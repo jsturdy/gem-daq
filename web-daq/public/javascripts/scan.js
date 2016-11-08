@@ -52,6 +52,10 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
         check_results();
     };
 
+    $scope.read_scan = function() {
+      plot_results();
+    };
+
     function check_results() {
         socket.ipbus_read(oh_scan_reg(OHID, 9), function(data) {
             $scope.scanStatus = (data == 0 ? 2 : 1);
@@ -66,16 +70,17 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     };
 
     function plot_results() {
-        var nSamples = $scope.maxVal - $scope.minVal;
+        var nSamples = $scope.maxVal - $scope.minVal + 1;
 
         var chartData = new google.visualization.DataTable();
         chartData.addColumn('number', 'X');
         chartData.addColumn('number', 'Percentage');
 
-        if ($scope.type == 0) var title = 'Threshold scan';
-        else if ($scope.type == 1) var title = 'Threshold scan by channel';
-        else if ($scope.type == 2) var title = 'Latency scan';
-        else if ($scope.type == 3) var title = 'S-Curve scan';
+        if ($scope.type.id == 0) var title = 'Threshold scan';
+        else if ($scope.type.id == 1) var title = 'Threshold scan by channel';
+        else if ($scope.type.id == 2) var title = 'Latency scan';
+        else if ($scope.type.id == 3) var title = 'S-Curve scan';
+        else if ($scope.type.id == 4) var title = 'Threshold scan (TK data)';
 
         var options = {
             title: title,

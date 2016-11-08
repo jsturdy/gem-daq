@@ -101,6 +101,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     ];
 
     $scope.statRegs = [
+        { name: 'Firmware date', data: 0 },
         { name: 'Firmware version', data: 0 },
         { name: 'QPLL locked', data: 0 },
         { name: 'QPLL PLL locked', data: 0 },
@@ -115,7 +116,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
             $scope.t1Source.id,
             $scope.loopbackSource
         ]);
-        socket.ipbus_blockWrite(oh_system_reg(OHID, 5), [
+        socket.ipbus_blockWrite(oh_system_reg(OHID, 4), [
             parseInt($scope.sbitsMask, 16),
             (($scope.sbitSelect[5] & 0x1F) << 25) |
               (($scope.sbitSelect[4] & 0x1F) << 20) |
@@ -161,13 +162,14 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     get_oh_system_regs();
 
     function get_oh_status_regs() {
-        socket.ipbus_blockRead(oh_stat_reg(OHID, 0), 6, function(data) {
+        socket.ipbus_blockRead(oh_stat_reg(OHID, 0), 7, function(data) {
             $scope.statRegs[0].data = data[0];
-            $scope.statRegs[1].data = data[1];
-            $scope.statRegs[2].data = data[2];
-            $scope.statRegs[3].data = data[3];
-            $scope.statRegs[4].data = data[4];
-            $scope.statRegs[5].data = data[5];
+            $scope.statRegs[1].data = data[6];
+            $scope.statRegs[2].data = data[1];
+            $scope.statRegs[3].data = data[2];
+            $scope.statRegs[4].data = data[3];
+            $scope.statRegs[5].data = data[4];
+            $scope.statRegs[6].data = data[5];
         });
     }
 

@@ -7,7 +7,7 @@
 <div>
     <h1>VFAT2s I2C</h1>
     <div class="row">
-        <div class="col-md-12">   
+        <div class="col-md-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Help</h3>
@@ -15,7 +15,7 @@
                 <div class="panel-body">
                     <p>Using this control page you can read or write the values of the registers in the VFAT2s. To access a single VFAT2, use the "Basic I2C request" panel. To broadcast a request to a set of VFAT2s, use the "Extended I2C requests" and apply a "VFAT2s mask" to ignore given VFAT2s.</p>
                 </div>
-            </div>   
+            </div>
         </div>
     </div>
     <div class="row">
@@ -26,37 +26,27 @@
                     <h3 class="panel-title">Basic I2C request</h3>
                 </div>
                 <div class="panel-body">
-                    <div class="form-horizontal">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label">VFAT2</label>
-                            <div class="col-sm-8">
-                                <input type="number" class="form-control" min="0" max="23" ng-model="vfat2ID">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label">Register</label>
-                            <div class="col-sm-8">
-                                <select class="form-control" ng-model="vfat2Register" ng-options="item.name for item in dispRegisters track by item.id"></select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label">Write Data</label>
-                            <div class="col-sm-8">
-                                <input type="number" class="form-control" min="0" max="255" ng-model="vfat2Data">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-4 col-sm-10">
-                                <a class="btn btn-xs btn-info" ng-click="read()">Read</a>
-                                <a class="btn btn-xs btn-info" ng-click="write()">Write</a>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label>VFAT2</label>
+                        <input type="number" class="form-control" min="0" max="23" ng-model="vfat2ID">
                     </div>
+                    <div class="form-group">
+                        <label>Register</label>
+                        <select class="form-control" ng-model="vfat2Register" ng-options="item.name for item in dispRegisters track by item.id"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Write Data</label>
+                        <input type="number" class="form-control" min="0" max="255" ng-model="vfat2Data">
+                    </div>
+                    <p class="btn-group btn-group-justified">
+                        <a class="btn btn-xs btn-primary" ng-click="read()">Read</a>
+                        <a class="btn btn-xs btn-info" ng-click="write()">Write</a>
+                    </p>
                     <div class="well" ng-show="readResult != null">Result of the read operation: <b>{{ readResult | hex }}</b></div>
                 </div>
             </div>
-        </div>       
-        <div class="col-md-8">    
+        </div>
+        <div class="col-md-8">
             <!-- Extended I2C request -->
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -65,40 +55,30 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="form-horizontal">
-                                <div class="form-group">
-                                    <label class="col-sm-4 control-label">VFAT2s mask</label>
-                                    <div class="col-sm-8">
-                                        <div class="input-group">
-                                            <div class="input-group-addon">0x</div>
-                                            <input type="text" maxlength="6" class="form-control" ng-model="vfat2sMask">
-                                        </div>
-                                    </div>
+                            <div class="form-group">
+                                <label>VFAT2s mask</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">0x</div>
+                                    <input type="text" maxlength="6" class="form-control" ng-model="vfat2sMask">
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">Register</label>
-                                    <div class="col-sm-8">
-                                        <select class="form-control" ng-model="vfat2sRegister" ng-options="item.name for item in dispRegisters track by item.id"></select>
-                                    </div>
+                                    <label>Register</label>
+                                    <select class="form-control" ng-model="vfat2sRegister" ng-options="item.name for item in dispRegisters track by item.id"></select>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-4 control-label">Write Data</label>
-                                    <div class="col-sm-8">
-                                        <input type="number" class="form-control" min="0" max="255" ng-model="vfat2sData">
-                                    </div>
+                                    <label>Write Data</label>
+                                    <input type="number" class="form-control" min="0" max="255" ng-model="vfat2sData">
                                 </div>
-                                <div class="form-group">
-                                    <div class="col-sm-offset-4 col-sm-10">
-                                        <a class="btn btn-xs btn-info" ng-click="reads()">Read all</a>
-                                        <a class="btn btn-xs btn-info" ng-click="writes()">Write all</a>
-                                        <a class="btn btn-xs btn-primary" ng-click="reset_module()">Reset</a>
-                                    </div>
-                                </div>
+                                <p class="btn-group btn-group-justified">
+                                    <a class="btn btn-xs btn-primary" ng-click="reads()">Read all</a>
+                                    <a class="btn btn-xs btn-info" ng-click="writes()">Write all</a>
+                                    <a class="btn btn-xs btn-warning" ng-click="reset_module()">Reset</a>
+                                </p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div ng-show="readsResult.length > 0">
-                                <p>Results of the read operations</p> 
+                                <p>Results of the read operations</p>
                                 <table class="table">
                                     <thead>
                                         <tr>
@@ -118,7 +98,7 @@
                     </div>
                 </div>
             </div>
-        </div> 
+        </div>
     </div>
 </div>
 

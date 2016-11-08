@@ -7,7 +7,7 @@ var udp = dgram.createSocket('udp4');
 var net = require('net');
 var client = new net.Socket();
 
-var useUDP = false;
+var useUDP = true;
 var ipaddr = "192.168.0.161";
 var port = 50001;
 
