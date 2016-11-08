@@ -27,44 +27,48 @@ nunjucks.configure("views", { autoescape: true, express: app });
 
 
 
-app.get("/", function (req, res) { 
-    res.render("home.html", { js: "home" }); 
+app.get("/", function (req, res) {
+    res.render("home.html", { js: "home" });
 });
 
-app.get("/glib", function (req, res) { 
-    res.render("glib.html", { js: "glib" }); 
+app.get("/glib", function (req, res) {
+    res.render("glib.html", { js: "glib" });
 });
 
-app.get("/oh", function (req, res) { 
-    res.render("oh.html", { js: "oh" }); 
+app.get("/oh", function (req, res) {
+    res.render("oh.html", { js: "oh" });
 });
 
 app.get("/vfat2", function (req, res) {
-    res.render("vfat2.html", { js: "vfat2" });  
+    res.render("vfat2.html", { js: "vfat2" });
 });
 
 app.get(/\/vfat2\/[0-9]+/, function (req, res) {
-    res.render("vfat2.html", { js: "vfat2" });  
+    res.render("vfat2.html", { js: "vfat2" });
 });
 
-app.get("/i2c", function (req, res) { 
-    res.render("i2c.html", { js: "i2c" }); 
+app.get("/i2c", function (req, res) {
+    res.render("i2c.html", { js: "i2c" });
 });
 
-app.get("/scan", function (req, res) { 
-    res.render("scan.html", { js: "scan" }); 
+app.get("/scan", function (req, res) {
+    res.render("scan.html", { js: "scan" });
 });
 
-app.get("/t1", function (req, res) { 
-    res.render("t1.html", { js: "t1" }); 
+app.get("/ultra", function (req, res) {
+    res.render("ultra.html", { js: "ultra" });
 });
 
-app.get("/tkdata", function (req, res) { 
-    res.render("tkdata.html", { js: "tkdata" }); 
+app.get("/t1", function (req, res) {
+    res.render("t1.html", { js: "t1" });
 });
 
-app.get("/adc", function (req, res) { 
-    res.render("adc.html", { js: "adc" }); 
+app.get("/tkdata", function (req, res) {
+    res.render("tkdata.html", { js: "tkdata" });
+});
+
+app.get("/adc", function (req, res) {
+    res.render("adc.html", { js: "adc" });
 });
 
 

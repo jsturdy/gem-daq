@@ -36,6 +36,15 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
 
     $scope.zeroSuppress = false;
 
+    $scope.clkSource = 0;
+
+    $scope.clkSourceChoices = [
+        { name: "QPLL", id: 0 },
+        { name: "GBT", id: 1 }
+    ];
+
+    $scope.crcSuppress = false;
+
     $scope.wbCounters = [
         { name: 'GBT master', stb: 0, ack: 0 },
         { name: 'GTX master', stb: 0, ack: 0 },
@@ -106,7 +115,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
             $scope.t1Source.id,
             $scope.loopbackSource
         ]);
-        socket.ipbus_blockWrite(oh_system_reg(OHID, 4), [
+        socket.ipbus_blockWrite(oh_system_reg(OHID, 5), [
             parseInt($scope.sbitsMask, 16),
             (($scope.sbitSelect[5] & 0x1F) << 25) |
               (($scope.sbitSelect[4] & 0x1F) << 20) |
@@ -116,7 +125,9 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
               ($scope.sbitSelect[0] & 0x1F),
               $scope.triggerThrottling,
               ($scope.zeroSuppress == true ? 1 : 0),
-              $scope.sbitMode.id
+              $scope.sbitMode.id,
+              $scope.clkSource.id,
+              ($scope.crcSuppress == true ? 1 : 0)
             ],
             function() { Notification.primary('The OptoHybrid system registers have been updated'); }
         );
@@ -124,7 +135,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     };
 
     function get_oh_system_regs() {
-        socket.ipbus_blockRead(oh_system_reg(OHID, 0), 9, function(data) {
+        socket.ipbus_blockRead(oh_system_reg(OHID, 0), 11, function(data) {
             var mask = data[0].toString(16).toUpperCase();
             if (mask.length == 6) $scope.vfat2sMask = mask;
             else $scope.vfat2sMask = Array(6 - mask.length + 1).join('0') + mask;
@@ -142,6 +153,8 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
             $scope.triggerThrottling = data[6];
             $scope.zeroSuppress = (data[7] == 1 ? true : false);
             $scope.sbitMode = $scope.sbitModeChoices[data[8]];
+            $scope.clkSource = $scope.clkSourceChoices[data[9]]
+            $scope.crcSuppress = (data[10] == 1 ? true : false);
         });
     }
 
