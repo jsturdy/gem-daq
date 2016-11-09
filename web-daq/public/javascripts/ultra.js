@@ -54,14 +54,17 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     };
 
     $scope.read_scan = function() {
-      plot_results();
+      var mask = parseInt($scope.mask, 16);
+      for (var i = 0; i < 24; ++i) {
+        if (((mask >> i) & 0x1) == 0) plot_results(i);
+      }
     };
 
     function check_results() {
         socket.ipbus_read(oh_ultra_reg(OHID, 32), function(data) {
             $scope.scanStatus = (data == 0 ? 2 : 1);
-            var mask = parseInt($scope.mask, 16);
             if ($scope.scanStatus == 2) {
+                var mask = parseInt($scope.mask, 16);
                 for (var i = 0; i < 24; ++i) {
                   if (((mask >> i) & 0x1) == 0) plot_results(i);
                 }
