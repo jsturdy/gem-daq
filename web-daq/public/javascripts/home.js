@@ -3,9 +3,8 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     var OHID = (window.sessionStorage.OHID == undefined ? 0 : parseInt(window.sessionStorage.OHID));
 
     $scope.statRegs = [
-        { name: "GLIB firmware version", data: 0 },
-        { name: "OptoHybrid firmware date", data: 0 },
-        { name: "OptoHybrid firmware version", data: 0 }
+        { name: "GLIB firmware",       data: {date: 0, version: 0} },
+        { name: "OptoHybrid firmware", data: {date: 0, version: 0} }
     ];
 
     $scope.fifoFull = false;
@@ -21,9 +20,21 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     for (var i = 0; i < 24; ++i) $scope.vfat2Status.push({ id: i, isPresent: false, isOn: false });
 
     function get_stat_registers() {
-        socket.ipbus_read(0x00000002, function(data) { $scope.statRegs[0].data = data; });
-        socket.ipbus_read(oh_stat_reg(OHID, 0), function(data) { $scope.statRegs[1].data = data; });
-        socket.ipbus_read(oh_stat_reg(OHID, 3), function(data) { $scope.statRegs[2].data = data; });
+        socket.ipbus_read(0x00000002, function(data) {
+                var version = ((data>>28)&0xf)+"."+((data>>24)&0xf)+"."+((data>>16)&0xff);
+                var date = (2000+((data>>9)&0x7f))+"."+((data>>5)&0xf)+"."+((data)&0x1f);
+                $scope.statRegs[0].data.date    = date;
+                $scope.statRegs[0].data.version = version;
+            });
+        socket.ipbus_read(oh_stat_reg(OHID, 0), function(data) {
+                var year  = ((data>>16)&0xffff).toString(16);
+                var month = ((data>>8)&0xff).toString(16);
+                var day   = ((data>>0)&0xff).toString(16);
+                var date  = year+"."+month+"."+day
+                $scope.statRegs[1].data.date = date; });
+        socket.ipbus_read(oh_stat_reg(OHID, 3), function(data) {
+                var result = ((data>>24)&0xff)+"."+((data>>16)&0xff)+"."+((data>>8)&0xff)+"."+(data&0xff);
+                $scope.statRegs[1].data.version = result; });
     }
 
     function get_glib_status() {

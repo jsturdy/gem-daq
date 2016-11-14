@@ -101,10 +101,10 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     ];
 
     $scope.statRegs = [
-        { name: 'Firmware date', data: 0 },
+        { name: 'Firmware date',    data: 0 },
         { name: 'Firmware version', data: 0 },
-        { name: 'QPLL locked', data: 0 },
-        { name: 'QPLL PLL locked', data: 0 }
+        { name: 'QPLL locked',      data: 0 },
+        { name: 'QPLL PLL locked',  data: 0 }
     ];
 
     $scope.set_system_regs = function() {
@@ -160,8 +160,13 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
 
     function get_oh_status_regs() {
         socket.ipbus_blockRead(oh_stat_reg(OHID, 0), 4, function(data) {
-            $scope.statRegs[0].data = data[0];
-            $scope.statRegs[1].data = data[3];
+            var year  = ((data[0]>>16)&0xffff).toString(16);
+            var month = ((data[0]>>8)&0xff).toString(16);
+            var day   = ((data[0]>>0)&0xff).toString(16);
+            var date  = year+"."+month+"."+day
+            $scope.statRegs[0].data = date;
+            var version = ((data[3]>>24)&0xff)+"."+((data[3]>>16)&0xff)+"."+((data[3]>>8)&0xff)+"."+(data[3]&0xff);
+            $scope.statRegs[1].data = version;
             $scope.statRegs[2].data = data[1];
             $scope.statRegs[3].data = data[2];
         });
