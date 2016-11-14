@@ -1,0 +1,95 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+{% raw %}
+
+<div>
+    <h1>Ultra scans</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <!-- Parameters -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Scan parameters</h3>
+                </div>
+                <div class="panel-body">
+                  <div class="form-group">
+                      <label>Scan type</label>
+                      <select class="form-control" ng-model="type" ng-options="item.name for item in types track by item.id" ng-disabled="scanStatus == 1"></select>
+                  </div>
+                  <div class="form-group">
+                      <label>VFAT2 Mask</label>
+                      <div class="input-group">
+                          <div class="input-group-addon">0x</div>
+                          <input type="text" maxlength="6" class="form-control" ng-model="mask" ng-disabled="scanStatus == 1">
+                      </div>
+                  </div>
+                  <div class="form-group" ng-hide="type.id == 0 || type.id == 2 || type.id == 4">
+                      <label>Channel</label>
+                      <input type="number" class="form-control" min="0" max="127" ng-model="channel" ng-disabled="scanStatus == 1">
+                  </div>
+                  <div class="form-group">
+                      <label>Minimum value (default = 0)</label>
+                      <input type="number" class="form-control" min="0" max="255" ng-model="minVal" ng-disabled="scanStatus == 1">
+                  </div>
+                  <div class="form-group">
+                      <label>Maximum value (default = 255)</label>
+                      <input type="number" class="form-control" min="0" max="255" ng-model="maxVal" ng-disabled="scanStatus == 1">
+                  </div>
+                  <div class="form-group">
+                      <label>Steps (default = 1)</label>
+                      <input type="number" class="form-control" ng-model="steps" ng-disabled="scanStatus == 1">
+                  </div>
+                  <div class="form-group">
+                      <label>Number of events (default = 0xFFFFFF)</label>
+                      <input type="number" class="form-control" ng-model="nEvents" ng-disabled="scanStatus == 1">
+                  </div>
+                  <p><div class="alert alert-warning" ng-hide="type.id == 0">Important: this scan requires a trigger source!</div></p>
+                  <p><a class="btn btn-success btn-xs btn-block" ng-click="start_scan()" ng-disabled="scanStatus == 1">Start the scan</a></p>
+                  <p><a class="btn btn-primary btn-xs btn-block" ng-click="reset_scan()">Reset the module</a></p>
+                  <p><a class="btn btn-warning btn-xs btn-block" ng-click="read_scan()">Read data from the buffer</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <!-- Results -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Results</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-warning" ng-show="scanStatus == 1">A scan is currently running on the system...</div>
+                    <div id="chart0"></div>
+                    <div id="chart1"></div>
+                    <div id="chart2"></div>
+                    <div id="chart3"></div>
+                    <div id="chart4"></div>
+                    <div id="chart5"></div>
+                    <div id="chart6"></div>
+                    <div id="chart7"></div>
+                    <div id="chart8"></div>
+                    <div id="chart9"></div>
+                    <div id="chart10"></div>
+                    <div id="chart11"></div>
+                    <div id="chart12"></div>
+                    <div id="chart13"></div>
+                    <div id="chart14"></div>
+                    <div id="chart15"></div>
+                    <div id="chart16"></div>
+                    <div id="chart17"></div>
+                    <div id="chart18"></div>
+                    <div id="chart19"></div>
+                    <div id="chart20"></div>
+                    <div id="chart21"></div>
+                    <div id="chart22"></div>
+                    <div id="chart23"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endraw %}
+
+{% endblock %}

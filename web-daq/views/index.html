@@ -12,8 +12,8 @@
     <body>
 
         <div class="row">
-            <div class="col-sm-2" ng-controller="commonCtrl" id="menu">        
-                 <h2 class="text-center"><span class="glyphicon glyphicon-fire text-warning"></span> GEM DAQ</h2>  
+            <div class="col-sm-2" ng-controller="commonCtrl" id="menu">
+                 <h2 class="text-center"><span class="glyphicon glyphicon-fire text-warning"></span> GEM DAQ</h2>
                 {% raw %}
                     <hr>
                     <a class="btn btn-block btn-xs btn-primary navbar-toggle collapsed" data-toggle="collapse" data-target="#collapseExample">
@@ -27,19 +27,20 @@
                         <li><a href="/vfat2">VFAT2s Dashboard</a></li>
                         <li><hr></li>
                         <li><a href="/adc">OptoHybrid ADC</a></li>
-                        <li><a href="/t1">OptoHybrid T1 controller</a></li>      
+                        <li><a href="/t1">OptoHybrid T1 controller</a></li>
                         <li><a href="/i2c">VFAT2s I2C</a></li>
                         <li><a href="/scan">VFAT2s Scans</a></li>
-                        <li><a href="/tkdata">Tracking Data</a></li>                  
-                    </ul>    
+                        <li><a href="/ultra">Ultra Scans</a></li>
+                        <li><a href="/tkdata">Tracking Data</a></li>
+                    </ul>
                 {% endraw %}
                 <div class="col-xs-offset-1">
                     <span class="label label-default">GEM Chamber Selection</span>
                     <div class="radio"><label><input type="radio" name="ohSelect" id="ohSelect" value="0" checked="" ng-model="OHID" ng-value="0" ng-change="oh_change()"> GEM <b>#0</b></label></div>
-                    <div class="radio"><label><input type="radio" name="ohSelect" id="ohSelect" value="1" ng-model="OHID" ng-value="1" ng-change="oh_change()"> GEM <b>#1</b></label></div>   
+                    <div class="radio"><label><input type="radio" name="ohSelect" id="ohSelect" value="1" ng-model="OHID" ng-value="1" ng-change="oh_change()"> GEM <b>#1</b></label></div>
                 </div>
                 <a href="#" class="btn btn-block btn-link" id="totop">Back to the top</a>
-            </div>      
+            </div>
             <div class="col-sm-10 col-sm-offset-2" ng-controller="appCtrl">
                 <div class="container">
                     {% block content %}{% endblock %}

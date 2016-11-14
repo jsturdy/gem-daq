@@ -156,7 +156,6 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
         { name: "ChannelReg 127", id: 144 }
     ];
 
-
     $scope.vfat2ID = 0;
 
     $scope.vfat2Register = { id: 0 };
@@ -164,7 +163,6 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     $scope.vfat2Data = 0;
 
     $scope.readResult = null;
-
 
     $scope.vfat2sMask = "000000";
 
@@ -185,16 +183,24 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
         socket.ipbus_write(vfat2_reg(OHID, $scope.vfat2ID, $scope.vfat2Register.id), $scope.vfat2Data, function(data) { Notification.primary('The write transaction has been completed'); });
     };
 
+    function getResults(nReads) {
+      socket.ipbus_read(oh_ei2c_reg(OHID, 259), function(data) {
+        if (data == 0) {
+          socket.ipbus_fifoRead(oh_ei2c_reg(OHID, 257), nReads, function(data) {
+              for (var i = 0; i < data.length; ++i) $scope.readsResult.push({ vfat2: (data[i] >> 8) & 0xFF, data: data[i] & 0xFF });
+          });
+        }
+        else getResults(nReads);
+      });
+    }
+
     $scope.reads = function() {
         $scope.readsResult = [];
         var mask = parseInt($scope.vfat2sMask, 16);
-        console.log("popcount("+mask+") = "+popcount(mask));
         var nReads = 24 - popcount(mask);
         socket.ipbus_write(oh_ei2c_reg(OHID, 256), mask);
         socket.ipbus_read(oh_ei2c_reg(OHID, $scope.vfat2sRegister.id));
-        socket.ipbus_fifoRead(oh_ei2c_reg(OHID, 257), nReads, function(data) {
-            for (var i = 0; i < data.length; ++i) $scope.readsResult.push({ vfat2: (data[i] >> 8) & 0xFF, data: data[i] & 0xFF });
-        });
+        getResults(nReads);
     };
 
     $scope.writes = function() {

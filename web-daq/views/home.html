@@ -6,8 +6,8 @@
 
 <div>
     <h1>GEM DAQ Interface</h1>
-    <div class="row">        
-        <div class="col-md-4">                
+    <div class="row">
+        <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">System info</h3>
@@ -24,7 +24,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">                
+        <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">System status</h3>
@@ -33,17 +33,26 @@
                     <p ng-show="fifoFull"><a class="btn btn-block btn-danger btn-xs" href="/tkdata">The FIFOs are <b>full</b> on GLIB</a></p>
                     <p ng-show="!fifoFull"><a class="btn btn-block btn-default btn-xs" href="/tkdata">The FIFOs are <b>not full</b> on GLIB</a></p>
 
-                    <p ng-show="scanStatus == 1"><a class="btn btn-block btn-danger btn-xs" href="/threshold">A <b>threshold scan</b> is running on OptoHybrid</a></p>
-                    <p ng-show="scanStatus == 3"><a class="btn btn-block btn-danger btn-xs" href="/latency">A <b>latency scan</b> is running on OptoHybrid</a></p>
-                    <p ng-show="scanStatus == 4"><a class="btn btn-block btn-danger btn-xs" href="/scurve">A <b>s-curve scan</b> is running on OptoHybrid</a></p>
+                    <p ng-show="scanStatus == 1"><a class="btn btn-block btn-danger btn-xs" href="/scan">A <b>threshold scan</b> is running on OptoHybrid</a></p>
+                    <p ng-show="scanStatus == 2"><a class="btn btn-block btn-danger btn-xs" href="/scan">A <b>threshold scan (channel)</b> is running on OptoHybrid</a></p>
+                    <p ng-show="scanStatus == 3"><a class="btn btn-block btn-danger btn-xs" href="/scan">A <b>latency scan</b> is running on OptoHybrid</a></p>
+                    <p ng-show="scanStatus == 4"><a class="btn btn-block btn-danger btn-xs" href="/scan">A <b>s-curve scan</b> is running on OptoHybrid</a></p>
+                    <p ng-show="scanStatus == 5"><a class="btn btn-block btn-danger btn-xs" href="/scan">A <b>threshold (tk) scan</b> is running on OptoHybrid</a></p>
                     <p ng-show="scanStatus == 0"><a class="btn btn-block btn-default btn-xs"><b>No scan</b> is running on OptoHybrid</a></p>
+
+                    <p ng-show="ultraStatus == 1"><a class="btn btn-block btn-danger btn-xs" href="/ultra">A <b>ultra threshold scan</b> is running on OptoHybrid</a></p>
+                    <p ng-show="ultraStatus == 2"><a class="btn btn-block btn-danger btn-xs" href="/ultra">A <b>ultra threshold scan (channel)</b> is running on OptoHybrid</a></p>
+                    <p ng-show="ultraStatus == 3"><a class="btn btn-block btn-danger btn-xs" href="/ultra">A <b>ultra latency scan</b> is running on OptoHybrid</a></p>
+                    <p ng-show="ultraStatus == 4"><a class="btn btn-block btn-danger btn-xs" href="/ultra">A <b>ultra s-curve scan</b> is running on OptoHybrid</a></p>
+                    <p ng-show="ultraStatus == 5"><a class="btn btn-block btn-danger btn-xs" href="/ultra">A <b>threshold (tk) scan</b> is running on OptoHybrid</a></p>
+                    <p ng-show="ultraStatus == 0"><a class="btn btn-block btn-default btn-xs"><b>No ultra scan</b> is running on OptoHybrid</a></p>
 
                     <p ng-show="t1Status"><a class="btn btn-block btn-danger btn-xs" href="/t1">The T1 controller is <b>running</b> on OptoHybrid</a></p>
                     <p ng-show="!t1Status"><a class="btn btn-block btn-default btn-xs" href="/t1">The T1 controller is <b>not running</b> on OptoHybrid</a></p>
                 </div>
             </div>
         </div>
-        <div class="col-md-4"> 
+        <div class="col-md-4">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">VFAT2s status</h3>
@@ -57,9 +66,9 @@
                         </span>
                     </p>
                 </div>
-            </div>  
-        </div>   
-    </div>    
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endraw %}

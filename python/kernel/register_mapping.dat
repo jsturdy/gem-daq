@@ -23,7 +23,7 @@ glib_cnt_amc13_l1a      0x6000000a   ffffffff 1 1
 glib_cnt_amc13_calpulse 0x6000000b   ffffffff 1 1
 glib_cnt_amc13_resync   0x6000000c   ffffffff 1 1
 glib_cnt_amc13_bc0      0x6000000d   ffffffff 1 1
-glib_cnt_err_tk0        0x6000000e   ffffffff 1 1  
+glib_cnt_err_tk0        0x6000000e   ffffffff 1 1
 glib_cnt_err_tk1        0x6000000f   ffffffff 1 1
 glib_cnt_err_tr0        0x60000010   ffffffff 1 1
 glib_cnt_err_tr1        0x60000011   ffffffff 1 1
@@ -41,6 +41,42 @@ scan_n                  0x42000007 ffffffff 1 1
 scan_data               0x42000008 ffffffff 1 1
 scan_status             0x42000009 ffffffff 1 1
 scan_reset              0x4200000a ffffffff 1 1
+
+
+ultra_toggle             0x4D000000 ffffffff 1 1
+ultra_mode               0x4D000001 ffffffff 1 1
+ultra_mask              0x4D000002 ffffffff 1 1
+ultra_channel            0x4D000003 ffffffff 1 1
+ultra_min                0x4D000004 ffffffff 1 1
+ultra_max                0x4D000005 ffffffff 1 1
+ultra_step               0x4D000006 ffffffff 1 1
+ultra_n                  0x4D000007 ffffffff 1 1
+ultra_data0               0x4D000008 ffffffff 1 1
+ultra_data1               0x4D000009 ffffffff 1 1
+ultra_data2               0x4D00000a ffffffff 1 1
+ultra_data3               0x4D00000b ffffffff 1 1
+ultra_data4               0x4D00000c ffffffff 1 1
+ultra_data5               0x4D00000d ffffffff 1 1
+ultra_data6               0x4D00000e ffffffff 1 1
+ultra_data7               0x4D00000f ffffffff 1 1
+ultra_data8               0x4D000010 ffffffff 1 1
+ultra_data9               0x4D000011 ffffffff 1 1
+ultra_data10               0x4D000012 ffffffff 1 1
+ultra_data11              0x4D000013 ffffffff 1 1
+ultra_data12              0x4D000014 ffffffff 1 1
+ultra_data13              0x4D000015 ffffffff 1 1
+ultra_data14              0x4D000016 ffffffff 1 1
+ultra_data15              0x4D000017 ffffffff 1 1
+ultra_data16              0x4D000018 ffffffff 1 1
+ultra_data17              0x4D000019 ffffffff 1 1
+ultra_data18              0x4D00001a ffffffff 1 1
+ultra_data19              0x4D00001b ffffffff 1 1
+ultra_data20              0x4D00001c ffffffff 1 1
+ultra_data21              0x4D00001d ffffffff 1 1
+ultra_data22              0x4D00001e ffffffff 1 1
+ultra_data23              0x4D00001f ffffffff 1 1
+ultra_status             0x4D000020 ffffffff 1 1
+ultra_reset              0x4D000021 ffffffff 1 1
 
 t1_toggle               0x43000000 ffffffff 1 1
 t1_mode                 0x43000001 ffffffff 1 1

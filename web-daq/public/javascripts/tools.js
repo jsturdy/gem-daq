@@ -15,6 +15,7 @@ function oh_stat_reg(oh, reg) { return 0x4C000000 + ((oh & 0xf) << 20) + (reg & 
 
 function oh_adc_reg(oh, reg) { return 0x48000000 + ((oh & 0xf) << 20) + (reg & 0xff); }
 
+function oh_ultra_reg(oh, reg) { return 0x4D000000 + ((oh & 0xf) << 20) + (reg & 0xff); }
 
 function tkdata_reg(oh, reg) { return 0x50000000 + ((oh & 0xf) << 20) + (reg & 0xf); }
 

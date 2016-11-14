@@ -13,73 +13,65 @@
                     <h3 class="panel-title">ADC request</h3>
                 </div>
                 <div class="panel-body">
-                    <div class="form-horizontal">
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label">Register</label>
-                            <div class="col-sm-8">
-                                <select class="form-control" ng-model="register">
-                                    <option value="0" selected>Temperature</option>
-                                    <option value="1">Vccint</option>
-                                    <option value="2">Vccaux</option>
-                                    <option value="3">VP/VN</option>
-                                    <option value="16">VAUX[0]</option>
-                                    <option value="17">VAUX[1]</option>
-                                    <option value="18">VAUX[2]</option>
-                                    <option value="19">VAUX[3]</option>
-                                    <option value="20">VAUX[4]</option>
-                                    <option value="21">VAUX[5]</option>
-                                    <option value="22">VAUX[6]</option>
-                                    <option value="23">VAUX[7]</option>
-                                    <option value="24">VAUX[8]</option>
-                                    <option value="25">VAUX[9]</option>
-                                    <option value="26">VAUX[10]</option>
-                                    <option value="27">VAUX[11]</option>
-                                    <option value="28">VAUX[12]</option>
-                                    <option value="29">VAUX[13]</option>
-                                    <option value="30">VAUX[14]</option>
-                                    <option value="31">VAUX[15]</option>
-                                    <option value="32">Temperature Max</option>
-                                    <option value="33">Vccint Max</option>
-                                    <option value="34">Vccaux Max</option>
-                                    <option value="36">Temperature Min</option>
-                                    <option value="37">Vccint Min</option>
-                                    <option value="38">Vccaux Min</option>
-                                    <option value="64">Control Register 0</option>
-                                    <option value="65">Control Register 1</option>
-                                    <option value="66">Control Register 2</option>
-                                    <option value="67">Test Register 0</option>
-                                    <option value="68">Test Register 1</option>
-                                    <option value="69">Test Register 2</option>
-                                    <option value="70">Test Register 3</option>
-                                    <option value="71">Test Register 4</option>
-                                    <option value="72">Sequence Register 0</option>
-                                    <option value="73">Sequence Register 1</option>
-                                    <option value="74">Sequence Register 2</option>
-                                    <option value="75">Sequence Register 3</option>
-                                    <option value="76">Sequence Register 4</option>
-                                    <option value="77">Sequence Register 5</option>
-                                    <option value="78">Sequence Register 6</option>
-                                    <option value="79">Sequence Register 7</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-4 control-label">Write Data</label>
-                            <div class="col-sm-8">
-                                <input type="number" class="form-control" ng-model="regData">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-4 col-sm-10">
-                                <a class="btn btn-xs btn-info" ng-click="read()">Read</a>
-                                <a class="btn btn-xs btn-info" ng-click="write()">Write</a>
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label>Register</label>
+                        <select class="form-control" ng-model="register">
+                            <option value="0" selected>Temperature</option>
+                            <option value="1">Vccint</option>
+                            <option value="2">Vccaux</option>
+                            <option value="3">VP/VN</option>
+                            <option value="16">VAUX[0]</option>
+                            <option value="17">VAUX[1]</option>
+                            <option value="18">VAUX[2]</option>
+                            <option value="19">VAUX[3]</option>
+                            <option value="20">VAUX[4]</option>
+                            <option value="21">VAUX[5]</option>
+                            <option value="22">VAUX[6]</option>
+                            <option value="23">VAUX[7]</option>
+                            <option value="24">VAUX[8]</option>
+                            <option value="25">VAUX[9]</option>
+                            <option value="26">VAUX[10]</option>
+                            <option value="27">VAUX[11]</option>
+                            <option value="28">VAUX[12]</option>
+                            <option value="29">VAUX[13]</option>
+                            <option value="30">VAUX[14]</option>
+                            <option value="31">VAUX[15]</option>
+                            <option value="32">Temperature Max</option>
+                            <option value="33">Vccint Max</option>
+                            <option value="34">Vccaux Max</option>
+                            <option value="36">Temperature Min</option>
+                            <option value="37">Vccint Min</option>
+                            <option value="38">Vccaux Min</option>
+                            <option value="64">Control Register 0</option>
+                            <option value="65">Control Register 1</option>
+                            <option value="66">Control Register 2</option>
+                            <option value="67">Test Register 0</option>
+                            <option value="68">Test Register 1</option>
+                            <option value="69">Test Register 2</option>
+                            <option value="70">Test Register 3</option>
+                            <option value="71">Test Register 4</option>
+                            <option value="72">Sequence Register 0</option>
+                            <option value="73">Sequence Register 1</option>
+                            <option value="74">Sequence Register 2</option>
+                            <option value="75">Sequence Register 3</option>
+                            <option value="76">Sequence Register 4</option>
+                            <option value="77">Sequence Register 5</option>
+                            <option value="78">Sequence Register 6</option>
+                            <option value="79">Sequence Register 7</option>
+                        </select>
                     </div>
+                    <div class="form-group">
+                        <label>Write Data</label>
+                        <input type="number" class="form-control" ng-model="regData">
+                    </div>
+                    <p class="btn-group btn-group-justified">
+                      <a class="btn btn-xs btn-primary" ng-click="read()">Read</a>
+                      <a class="btn btn-xs btn-info" ng-click="write()">Write</a>
+                    </p>
                     <div class="well" ng-show="readResult != null">Result of the read operation: <b>{{ readResult }}</b></div>
                 </div>
             </div>
-        </div> 
+        </div>
     </div>
 </div>
 
