@@ -10,9 +10,9 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     $scope.types = [
         { name: "Threshold scan", id: 0 },
         { name: "Threshold scan by channel", id: 1 },
-        { name: "Threshold scan using tracking data", id: 4 },
         { name: "Latency scan", id: 2 },
-        { name: "S-Curve scan", id: 3 }
+        { name: "S-Curve scan", id: 3 },
+        { name: "Threshold scan using tracking data", id: 4 }
     ];
 
     $scope.scanStatus = 0;

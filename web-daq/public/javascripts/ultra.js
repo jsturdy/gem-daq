@@ -9,9 +9,9 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     $scope.types = [
         { name: "Threshold scan", id: 0 },
         { name: "Threshold scan by channel", id: 1 },
-        { name: "Threshold scan using tracking data", id: 4 },
         { name: "Latency scan", id: 2 },
-        { name: "S-Curve scan", id: 3 }
+        { name: "S-Curve scan", id: 3 },
+        { name: "Threshold scan using tracking data", id: 4 }
     ];
 
     $scope.scanStatus = 0;
@@ -106,7 +106,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
         };
 
         socket.ipbus_fifoRead(oh_ultra_reg(OHID, 8 + vfat2), nSamples, function(data) {
-            for (var i = 0; i < data.length; ++i) chartData.addRow([ (data[vfat2] >> 24) & 0xFF, (data[vfat2] & 0x00FFFFFF) / (1. * $scope.nEvents) * 100 ]);
+            for (var i = 0; i < data.length; ++i) chartData.addRow([ (data[i] >> 24) & 0xFF, (data[i] & 0x00FFFFFF) / (1. * $scope.nEvents) * 100 ]);
             charts[vfat2].draw(chartData, options);
         });
     };

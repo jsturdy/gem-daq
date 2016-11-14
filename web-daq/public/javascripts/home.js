@@ -23,7 +23,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     function get_stat_registers() {
         socket.ipbus_read(0x00000002, function(data) { $scope.statRegs[0].data = data; });
         socket.ipbus_read(oh_stat_reg(OHID, 0), function(data) { $scope.statRegs[1].data = data; });
-        socket.ipbus_read(oh_stat_reg(OHID, 6), function(data) { $scope.statRegs[2].data = data; });
+        socket.ipbus_read(oh_stat_reg(OHID, 3), function(data) { $scope.statRegs[2].data = data; });
     }
 
     function get_glib_status() {
