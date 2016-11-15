@@ -126,17 +126,21 @@
                         <thead>
                             <tr>
                                 <th>Register</th>
-                                <th>Status</th>
+                                <th>Date/Locked</th>
+                                <th>Version/Lock Counter</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-repeat="reg in statRegs" ng-class="{ danger: reg.data == 0 }">
                                 <td>{{ reg.name }}</td>
-                                <td>{{ reg.data }}</td>
+                                <td>{{ reg.data.val1 }}</td>
+                                <td>{{ reg.data.val2 }}</td>
                                 <!-- <td>{{ reg.data | hex }}</td> -->
                             </tr>
                         </tbody>
                     </table>
+                    <hr>
+                    <p><a class="btn btn-primary btn-xs btn-block" ng-click="reset_qpll_counters()">Reset the QPLL counters</a></p>
                 </div>
             </div>
         </div>

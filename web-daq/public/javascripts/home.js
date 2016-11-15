@@ -33,7 +33,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
                 var date  = year+"."+month+"."+day
                 $scope.statRegs[1].data.date = date; });
         socket.ipbus_read(oh_stat_reg(OHID, 3), function(data) {
-                var result = ((data>>24)&0xff)+"."+((data>>16)&0xff)+"."+((data>>8)&0xff)+"."+(data&0xff);
+                var result = ((data>>24)&0xff)+"."+((data>>16)&0xff)+"."+((data>>8)&0xff)+"."+(data&0xff).toString(16);
                 $scope.statRegs[1].data.version = result; });
     }
 
