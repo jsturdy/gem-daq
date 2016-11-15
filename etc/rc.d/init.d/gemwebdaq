@@ -53,8 +53,24 @@ nodeinstance=$(eval "printf 'app_slot%02d.js' '$2'")
 nodeproc=$(eval "printf 'slot%02d' '$2'")
 nodepid=$(ps -ef|fgrep node|fgrep $nodeinstance|awk '{print $2}')
 logfile=$(eval "printf '/var/log/gemdaq/web-daq/slot%02d.out' '$2'")
+errfile=$(eval "printf '/var/log/gemdaq/web-daq/slot%02d.err' '$2'")
+
+## Close STDOUT file descriptor
+#exec 1<&-
+## Close STDERR FD
+#exec 2<&-
+#
+## Open STDOUT as $LOG_FILE file for read and write.
+#exec 1<>$logfile
+#
+## Open STDERR as $ERR_FILE file for read and write.
+#exec 2<>$errfile
+#
+## Redirect STDERR to STDOUT
+#exec 2>&1
 
 touch $logfile
+touch $errfile
 
 echo $0 $1 $2 >> $logfile
 echo date --utc >> $logfile
@@ -67,12 +83,15 @@ start() {
 	echo "Stop first, or restart!"
     else
 	cd ${WEBDAQROOT}
-	cmd="printf 'node app_slot%02d.js >> $logfile 2>&1 &\n' '$1'"
+	cmd="printf 'node app_slot%02d.js >> $logfile 2>> $errfile &\n' '$1'"
+	#cmd="printf 'node app_slot%02d.js >> $logfile &\n' '$1'"
+	#cmd="printf 'node app_slot%02d.js &\n' '$1'"
 
-	echo "starting web-daq on $nodeproc and logging to $logfile" >> $logfile
-	echo "starting web-daq on $nodeproc and logging to $logfile"
+	echo "starting web-daq on $nodeproc and logging to $logfile, $errfile" >> $logfile
+	echo "starting web-daq on $nodeproc and logging to $logfile, $errfile"
 	#echo "su gemuser -c '$cmd'"
 	echo $(eval "$cmd") >> $logfile
+
 	$(eval $cmd) &
 	RETVAL=$?
 	return $RETVAL
