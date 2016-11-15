@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # ignore everything
 *
 
@@ -25,19 +24,14 @@
 !*.woff2
 !*.ttf
 
-=======
->>>>>>> tlenzi-master-new
 .DS_Store
 data/
 
 # Logs
 logs
 *.log
-<<<<<<< HEAD
 
 # Output files
-=======
->>>>>>> tlenzi-master-new
 *.out
 
 # Runtime data
