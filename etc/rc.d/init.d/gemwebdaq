@@ -72,9 +72,8 @@ errfile=$(eval "printf '/var/log/gemdaq/web-daq/slot%02d.err' '$2'")
 touch $logfile
 touch $errfile
 
-echo $0 $1 $2 >> $logfile
-echo `date --utc` >> $logfile
 echo "#######################################################" >> $logfile
+echo $0 $1 $2 |ts >> $logfile
 
 start() {
     if [ -n "$nodepid" ]
@@ -84,17 +83,13 @@ start() {
     else
 	cd ${WEBDAQROOT}
 	cmd="printf 'node app_slot%02d.js 2>> $errfile  >> $logfile &\n' '$1'"
-	#cmd="printf 'node app_slot%02d.js >> $logfile &\n' '$1'"
-	#cmd="printf 'node app_slot%02d.js &\n' '$1'"
 
-	echo "starting web-daq on $nodeproc and logging to $logfile, $errfile" | ts |tee -a $logfile
-	#echo "starting web-daq on $nodeproc and logging to $logfile, $errfile"
-	#echo "su gemuser -c '$cmd'"
-	echo $(eval "$cmd") | ts |tee -a $logfile
+	echo "starting web-daq on $nodeproc and logging to $logfile, $errfile" | ts | tee -a $logfile
+	echo $(eval "$cmd") | ts | tee -a $logfile
 
 	# do we really need to see all the requests?
 	# can redirect to /dev/null?
-	$(eval $cmd) 2>> $errfile  >> $logfile &
+	exec `eval $cmd` 2>> $errfile >> $logfile &
 	RETVAL=$?
 	return $RETVAL
     fi
@@ -104,9 +99,8 @@ start() {
 stop() {
     if [ -n "$nodepid" ]
     then
-	echo "killing web-daq on $nodeproc is running with pid $nodepid" | ts |tee -a $logfile
-	#echo "killing web-daq on $nodeproc is running with pid $nodepid"
-	echo "kill $nodepid" | ts |tee -a $logfile
+	echo "killing web-daq on $nodeproc is running with pid $nodepid" | ts | tee -a $logfile
+	echo "kill $nodepid" | ts >> $logfile
 	kill $nodepid
 	RETVAL=$?
 	return $RETVAL
@@ -124,11 +118,9 @@ restart() {
 status() {
     if [ -n "$nodepid" ]
     then
-	echo "web-daq on $nodeproc is running with pid $nodepid" | ts |tee -a $logfile
-	#echo "web-daq on $nodeproc is running with pid $nodepid"
+	echo "web-daq on $nodeproc is running with pid $nodepid" | ts | tee -a $logfile
     else
-	echo "web-daq on $nodeproc is not running" | ts |tee -a $logfile
-	#echo "web-daq on $nodeproc is not running"
+	echo "web-daq on $nodeproc is not running" | ts | tee -a $logfile
     fi
     return 0
 }
@@ -175,4 +167,4 @@ case "$1" in
 	exit 1
 esac
 echo "#######################################################" >> $logfile
-
+echo >> $logfile
