@@ -1,0 +1,170 @@
+#!/bin/bash
+#
+# gemwebdaq	Starts up the gemwebdaq server daemon
+#
+# chkconfig: 25 99 01
+# description: web-daq is a javascript based node application interfacing
+#              to the GEM DAQ hardware
+#              This service starts up the web-daq server daemon.
+#
+#              Logging setup to: /var/log/gemdaq/web-daq
+#
+#              Should set this up with an rpm
+#               - sudo mkdir -p /var/log/gemdaq/web-daq
+#               - sudo chgrp gemuser -R /var/log/gemdaq
+#               - sudo chmod g+s /var/log/gemdaq
+#               - sudo chmod g+s /var/log/gemdaq/web-daq
+#               - find /var/log/gemdaq -type d |xargs -n1 sudo chmod ag+rx
+#               - find /var/log/gemdaq -type d |xargs -n1 sudo chmod g+w
+#               - sudo chgrp gemuser /var/log/gemdaq/web-daq/*.out
+#               - sudo chkconfig --add gemwebdaq
+# 
+# processname: gemwebdaq
+
+### BEGIN INIT INFO
+# Provides: gemwebdaq
+# Default-Start: 3 5
+# Default-Stop: 0 1 6
+# Short-Description: Starts up the gemwebdaq server daemon
+# description: web-daq is a javascript based node application interfacing
+#              to the GEM DAQ hardware
+#              This service starts up the web-daq server daemon.
+#
+### END INIT INFO
+
+# should set this up with RPM and a system installation
+WEBDAQROOT=/data/bigdisk/users/sturdy/software/gem-daq/web-daq
+
+export HOME=$WEBDAQROOT
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# should figure out how to daemonize better
+# exec="/path/to/<daemonname>"
+# prog="<service name>"
+# config="<path to major config file>"
+
+# [ -e /etc/sysconfig/$prog ] && . /etc/sysconfig/$prog
+
+# lockfile=$(eval "'print /var/lock/subsys/$prog-slot%02d' '$2'"
+
+nodeinstance=$(eval "printf 'app_slot%02d.js' '$2'")
+nodeproc=$(eval "printf 'slot%02d' '$2'")
+nodepid=$(ps -ef|fgrep node|fgrep $nodeinstance|awk '{print $2}')
+logfile=$(eval "printf '/var/log/gemdaq/web-daq/slot%02d.out' '$2'")
+errfile=$(eval "printf '/var/log/gemdaq/web-daq/slot%02d.err' '$2'")
+
+## Close STDOUT file descriptor
+#exec 1<&-
+## Close STDERR FD
+#exec 2<&-
+#
+## Open STDOUT as $LOG_FILE file for read and write.
+#exec 1<>$logfile
+#
+## Open STDERR as $ERR_FILE file for read and write.
+#exec 2<>$errfile
+#
+## Redirect STDERR to STDOUT
+#exec 2>&1
+
+touch $logfile
+touch $errfile
+
+echo "#######################################################" >> $logfile
+echo $0 $1 $2 |ts >> $logfile
+
+start() {
+    if [ -n "$nodepid" ]
+    then
+	echo "web-daq on $nodeproc is running with pid $nodepid"
+	echo "Stop first, or restart!"
+    else
+	cd ${WEBDAQROOT}
+	cmd="printf 'node app_slot%02d.js 2>> $errfile  >> $logfile &\n' '$1'"
+
+	echo "starting web-daq on $nodeproc and logging to $logfile, $errfile" | ts | tee -a $logfile
+	echo $(eval "$cmd") | ts | tee -a $logfile
+
+	# do we really need to see all the requests?
+	# can redirect to /dev/null?
+	exec `eval $cmd` 2>> $errfile >> $logfile &
+	RETVAL=$?
+	return $RETVAL
+    fi
+    return 0
+}
+
+stop() {
+    if [ -n "$nodepid" ]
+    then
+	echo "killing web-daq on $nodeproc is running with pid $nodepid" | ts | tee -a $logfile
+	echo "kill $nodepid" | ts >> $logfile
+	kill $nodepid
+	RETVAL=$?
+	return $RETVAL
+    else
+	echo "web-daq on $nodeproc is not running"
+    fi
+    return 0
+}
+
+restart() {
+    stop $1
+    start $1
+}
+
+status() {
+    if [ -n "$nodepid" ]
+    then
+	echo "web-daq on $nodeproc is running with pid $nodepid" | ts | tee -a $logfile
+    else
+	echo "web-daq on $nodeproc is not running" | ts | tee -a $logfile
+    fi
+    return 0
+}
+
+info() {
+    nodepids=$(ps -ef|fgrep node|fgrep slot|awk '{print $1 " " $2 " " $9}')
+    if [ -n "$nodepids" ]
+    then
+	echo "Currently running web-daq processes:"
+	for ((i=0;i<${#nodepids[*]};i++))
+	do
+	    echo "${nodepids[$i]}"
+	done
+    else
+	echo "No web-daq process is running"
+    fi
+    return 0
+}
+
+case "$1" in
+    'start')
+	start $2
+	RETVAL=$?
+	;;
+    'stop')
+	stop $2
+	RETVAL=$?
+	;;
+    'restart')
+	restart $2
+	RETVAL=$?
+	;;
+    'status')
+	status $2
+	RETVAL=$?
+	;;
+    'info')
+	info
+	RETVAL=$?
+	;;
+    *)
+    # usage
+	echo "Usage: $0 start|stop|restart|status <slot number> or info"
+	exit 1
+esac
+echo "#######################################################" >> $logfile
+echo >> $logfile

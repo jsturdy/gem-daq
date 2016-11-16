@@ -17,7 +17,8 @@
                         <tbody>
                             <tr ng-repeat="reg in statRegs" ng-class="{ danger: reg.data == 0 }">
                                 <td>{{ reg.name }}</td>
-                                <td>{{ reg.data | hex }}</td>
+                                <td>{{ reg.data.version }}</td>
+                                <td>{{ reg.data.date }}</td>
                             </tr>
                         </tbody>
                     </table>

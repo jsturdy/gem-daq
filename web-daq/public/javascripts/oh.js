@@ -101,10 +101,9 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     ];
 
     $scope.statRegs = [
-        { name: 'Firmware date', data: 0 },
-        { name: 'Firmware version', data: 0 },
-        { name: 'QPLL locked', data: 0 },
-        { name: 'QPLL PLL locked', data: 0 }
+        { name: 'Firmware',  data: {val1: 0, val2: 0 } },
+        { name: 'QPLL',      data: {val1: 0, val2: 0 } },
+        { name: 'QPLL PLL',  data: {val1: 0, val2: 0 } }
     ];
 
     $scope.set_system_regs = function() {
@@ -160,10 +159,15 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
 
     function get_oh_status_regs() {
         socket.ipbus_blockRead(oh_stat_reg(OHID, 0), 4, function(data) {
-            $scope.statRegs[0].data = data[0];
-            $scope.statRegs[1].data = data[3];
-            $scope.statRegs[2].data = data[1];
-            $scope.statRegs[3].data = data[2];
+            var year  = ((data[0]>>16)&0xffff).toString(16);
+            var month = ((data[0]>>8)&0xff).toString(16);
+            var day   = ((data[0]>>0)&0xff).toString(16);
+            var date  = year+"."+month+"."+day
+            $scope.statRegs[0].data.val1 = date;
+            var version = ((data[3]>>24)&0xff)+"."+((data[3]>>16)&0xff)+"."+((data[3]>>8)&0xff)+"."+(data[3]&0xff).toString(16);
+            $scope.statRegs[0].data.val2 = version;
+            $scope.statRegs[2].data.val1 = data[1];
+            $scope.statRegs[3].data.val1 = data[2];
         });
     }
 
@@ -239,6 +243,10 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
             $scope.t1Counters[3].cnt = data[5];
             $scope.gtxCounters[2].cnt = data[6];
       });
+        socket.ipbus_blockRead(oh_counter_reg(OHID, 107), 2, function(data) {
+            $scope.statRegs[2].data.val2 = data[0];
+            $scope.statRegs[3].data.val2 = data[1];
+        });
     }
 
     function get_status_loop() {
@@ -267,4 +275,8 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
         get_oh_counters();
     };
 
+    $scope.reset_qpll_counters = function() {
+        socket.ipbus_blockWrite(oh_counter_reg(OHID, 107), [0, 0], function() { Notification.primary('The QPLL and QPLL PLL counters have been reset'); });
+        get_oh_counters();
+    };
 }]);
