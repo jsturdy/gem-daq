@@ -79,7 +79,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     };
 
     function plot_results(vfat2) {
-        var nSamples = $scope.maxVal - $scope.minVal + 1;
+        var nSamples = $scope.maxVal - $scope.minVal;
 
         var chartData = new google.visualization.DataTable();
         chartData.addColumn('number', 'X');
