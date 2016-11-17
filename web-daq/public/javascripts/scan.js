@@ -70,7 +70,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
     };
 
     function plot_results() {
-        var nSamples = $scope.maxVal - $scope.minVal;
+        var nSamples = $scope.maxVal - $scope.minVal + 1;
 
         var chartData = new google.visualization.DataTable();
         chartData.addColumn('number', 'X');

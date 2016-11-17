@@ -54,8 +54,7 @@ web-daq/.lock-wscript
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 web-daq/build/Release
 
-# Dependency directory
-# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git-
+# Ignore node_modules
 web-daq/node_modules
 
 # Debug log from npm
@@ -63,3 +62,7 @@ web-daq/npm-debug.log
 
 # Compiled python
 *.pyc
+
+# Scripts
+Makefile
+*.sh
