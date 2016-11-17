@@ -10,7 +10,6 @@ module.exports = function(ipaddr, useUDP) {
   var io = require("socket.io")(server);
   var ipbus = require("./app/ipbus.js")(io, ipaddr, useUDP);
 
-
   app.set("views", path.join(__dirname, "views"));
   app.set("view engine", "nunjucks");
   app.use(logger("dev"));

@@ -5,6 +5,7 @@
 module.exports = function(io, ipaddr, useUDP) {
 
     var fs = require('fs');
+    var path = require('path');
 
     // UDP
     var dgram = require('dgram');
@@ -256,7 +257,7 @@ module.exports = function(io, ipaddr, useUDP) {
 
         socket.on('save', function(transaction, callback) {
             var now = require('moment')();
-            var fileName = "../data/" + transaction.type + "/" + now.format('YY-MM-DD-HH-mm-ss') + ".txt";
+            var fileName = path.join(__dirname, '/../../data/' + transaction.type + "/" + now.format('YY-MM-DD-HH-mm-ss') + ".txt");
             var content = "";
 
             if (transaction.type == "threshold" || transaction.type == "latency") {
