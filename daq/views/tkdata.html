@@ -1,0 +1,105 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+{% raw %}
+
+<div>
+    <h1>Tracking data readout</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Tracking data readout -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Readout control</h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        <a class="btn btn-success btn-xs" ng-click="toggle_readout()" ng-show="!enableReadout">Start data acquisition</a>
+                        <a class="btn btn-danger btn-xs" ng-click="toggle_readout()" ng-show="enableReadout">Stop data acquisition</a>
+                        <a class="btn btn-primary btn-xs" ng-click="reset_module()">Empty the tracking data buffer</a>
+                    </p>
+                </div>
+            </div>          
+        </div>
+        <div class="col-md-6">
+            <!-- Tracking data reset -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Events statistics</h3>
+                </div>
+                <div class="panel-body">
+                    <p>Acquired <b>{{ nAcquired }}</b> events!</p>
+                    <p>The OptoHybrid sent <b>{{ nSent }}</b> events!</p>
+                    <p>The GLIB received <b>{{ nReceived }}</b> events!</p>
+                    <p><b>{{ tkEventsAvailable }}</b> events are available for readout! ({{ tkEventsAvailable / 16383 * 100 | number: 1 }}% filled)</p>
+                    <p ng-show="tkFifoFull == true">The FIFO is <b>full</b>!</p>
+                    <p ng-show="tkFifoEmpty == true">The FIFO is <b>empty</b>!</p>     
+                </div>
+            </div>  
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">            
+        <!-- Tracking data reset -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">DQM plots</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6"><div id="bc_chart"></div></div>
+                        <div class="col-md-6"><div id="ec_chart"></div></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"><div id="flags_chart"></div></div>
+                        <div class="col-md-6"><div id="chipid_chart"></div></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6"><div id="strips_chart"></div></div>
+                    </div>      
+                </div>
+            </div>  
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Tracking data readout -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Event list</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>BX</th>
+                                <th>BC</th>
+                                <th>EC</th>
+                                <th>Flags</th>
+                                <th>ChipID</th>
+                                <th>Strips</th>
+                                <th>CRC</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="event in tkDataEvents track by $index">
+                                <td>{{ event.bx | hex }}</td>
+                                <td>{{ event.bc | hex }}</td>
+                                <td>{{ event.ec | hex }}</td>
+                                <td>{{ event.flags | hex }}</td>
+                                <td>{{ event.chipID | hex }}</td>
+                                <td>{{ event.strips0 | hex }} {{ event.strips1 | hex }} {{ event.strips2 | hex }} {{ event.strips3 | hex }}</td>
+                                <td>{{ event.crc | hex }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>          
+        </div>  
+    </div>
+</div>
+
+{% endraw %}
+
+{% endblock %}

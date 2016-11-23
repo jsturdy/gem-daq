@@ -1,0 +1,43 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+{% raw %}
+
+<div>
+    <h1>VFAT2s Rates</h1>
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Tracking data counter and masking -->
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Instanteneous Rates</h3>
+                </div>
+                <div class="panel-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>VFAT2 ID</th>
+                                <th>Trigger Data Rate (kHz)</th>
+                                <th>Valid Tracking Data Rate (kHz)</th>
+                                <th>Corrupted Tracking Data Rate (kHz)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="vfat2 in vfat2s">
+                                <td>#{{ vfat2.id }}</td>
+                                <td>{{ vfat2.trigger }}</td>
+                                <td>{{ vfat2.good }}</td>
+                                <td>{{ vfat2.bad }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endraw %}
+
+{% endblock %}
