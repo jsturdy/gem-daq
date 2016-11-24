@@ -2,6 +2,8 @@ var appVue = new Vue({
   el: 'section.content',
   data: {
     running: false,
+    error: false,
+    ready: false,
     type: 0,
     vfat2: 0,
     channel: 0,
@@ -9,7 +11,8 @@ var appVue = new Vue({
     max: 0,
     step: 0,
     events: 0,
-    status: 0,
+    seen: 0,
+    progress: 0,
     chart: null
   },
   methods: {
@@ -23,26 +26,34 @@ var appVue = new Vue({
         appVue.step = data[5];
         appVue.events = data[6];
       });
+      ipbus_read(oh_counter_reg(100), function(data) {
+        appVue.seen = data;
+      });
       this.drawChart();
       this.get();
     },
     get: function() {
       ipbus_read(oh_scan_reg(9), function(data) {
-        appVue.running = (data != 0);
-        if (appVue.status == 0 && !appVue.running) appVue.status = 0;
-        else if (appVue.status == 0 && appVue.running) appVue.status = 1;
-        else if (appVue.status == 1 && appVue.running) appVue.status = 1;
-        else if (appVue.status == 1 && !appVue.running) appVue.status = 2;
-        else if (appVue.status == 2 && appVue.running) appVue.status = 1;
-        else if (appVue.status == 2 && !appVue.running) appVue.status = 2;
-        else appVue.status = 0;
-        if (appVue.status == 2) appVue.read();
+        appVue.running = ((data & 0xf) != 0);
+        appVue.error = (((data >> 4) & 0x1) != 0);
+        appVue.ready = (((data >> 5) & 0x1) != 0);
+        if (!appVue.running && appVue.ready) appVue.read();
+      });
+      ipbus_read(oh_counter_reg(100), function(data) {
+        if (appVue.running)  appVue.progress = (data - appVue.seen) / ((appVue.max - appVue.min + 1) * appVue.events) * 100;
+        else appVue.progress = 0;
       });
     },
     launch: function() {
       if (this.running) return;
-      ipbus_blockWrite(oh_scan_reg(1), [ appVue.type, appVue.vfat2, appVue.channel, appVue.min, appVue.max, appVue.step, appVue.events ]);
+      if (this.max == 0) this.max = 255;
+      if (this.step == 0) this.step = 1;
+      if (this.events == 0) this.events = 0xFFFFFF;
+      ipbus_blockWrite(oh_scan_reg(1), [ this.type, this.vfat2, this.channel, this.min, this.max, this.step, this.events ]);
       ipbus_write(oh_scan_reg(0), 1);
+      ipbus_read(oh_counter_reg(100), function(data) {
+        appVue.seen = data;
+      });
       this.get();
     },
     reset: function() {
@@ -50,41 +61,36 @@ var appVue = new Vue({
       this.get();
     },
     read: function() {
-      if (this.status != 2) return;
-      this.status = 0;
-      this.chart.data.labels = [ ];
-      this.chart.data.datasets = [ ];
+      if (!this.ready) return;
+      this.ready = false;
       this.update();
     },
     update: function() {
-      ipbus_fifoRead(oh_scan_reg(8), (this.max - this.min + 1), function(data) {
-        var x = [ ];
-        var y = [ ];
+      this.chart.data.labels = [ ];
+      this.chart.data.datasets[0].data = [ ];
+      ipbus_fifoRead(oh_scan_reg(8), (this.max - this.min - 1), function(data) {
         for (var j = 0; j < data.length; ++j) {
-          x.push((data[j] >> 24) & 0xFF);
-          y.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
+          appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
+          appVue.chart.data.datasets[0].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
         }
-        appVue.chart.data.labels = x;
-        appVue.chart.data.datasets.push({
-          label: 'VFAT2 #' + appVue.vfat2,
-          data: y,
-          borderColor: colors[appVue.vfat2 % 6],
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          pointRadius: 2
-        });
+      });
+      ipbus_fifoRead(oh_scan_reg(8), 2, function(data) {
+        for (var j = 0; j < data.length; ++j) {
+          appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
+          appVue.chart.data.datasets[0].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
+        }
         appVue.chart.update();
       });
     },
     drawChart: function() {
       var width = $('#results').parent().width() - 40;
-      var height = 0.3 * width;
+      var height = Math.max(200, 0.3 * width);
       var canvas = $('#results').attr('width', width).attr('height', height);
       this.chart = new Chart(canvas, {
         type: 'line',
         data: {
           labels: [ ],
-          datasets: [ ]
+          datasets: [{ label: 'VFAT2', data: [ ], borderColor: colors[0], backgroundColor: 'transparent', borderWidth: 2, pointRadius: 2 }]
         },
         options: {
           scales: {
@@ -112,4 +118,4 @@ var appVue = new Vue({
 });
 
 appVue.init();
-setInterval(function() { appVue.get() }, 5000);
+setInterval(function() { appVue.get() }, 1000);

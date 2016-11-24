@@ -1,3 +1,8 @@
+.sidebar-opts {
+  padding: 20px; }
+  .sidebar-opts label {
+    color: #fff; }
+
 h3.box-title span {
   margin-left: 20px; }
 

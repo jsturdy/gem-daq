@@ -6,7 +6,9 @@ var appVue = new Vue({
     type: 0,
     events: 0,
     interval: 0,
-    delay: 0
+    delay: 0,
+    seen: 0,
+    progress: 0
   },
   methods: {
     init: function() {
@@ -17,17 +19,27 @@ var appVue = new Vue({
         appVue.interval = data[3];
         appVue.delay = data[4];
       });
+      ipbus_read(oh_counter_reg(100), function(data) {
+        appVue.seen = data;
+      });
       this.get();
     },
     get: function() {
       ipbus_read(oh_t1_reg(14), function(data) {
         appVue.running = (data == 0 ? false : true);
       });
+      ipbus_read(oh_counter_reg(100), function(data) {
+        if (appVue.running && appVue.events != 0)  appVue.progress = (data - appVue.seen) / (appVue.events) * 100;
+        else appVue.progress = 0;
+      });
     },
     start: function() {
       if (this.running) return;
       ipbus_blockWrite(oh_t1_reg(1), [ this.mode, this.type, this.events, this.interval, this.delay ]);
       ipbus_write(oh_t1_reg(0), 1);
+      ipbus_read(oh_counter_reg(100), function(data) {
+        appVue.seen = data;
+      });
       this.get();
     },
     stop: function() {
@@ -43,4 +55,4 @@ var appVue = new Vue({
 });
 
 appVue.init();
-setInterval(function() { appVue.get() }, 5000);
+setInterval(function() { appVue.get() }, 1000);

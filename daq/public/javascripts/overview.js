@@ -8,6 +8,7 @@ var appVue = new Vue({
     status: {
       t1: false,
       scan: false,
+      ultra: false
     },
     vfat2s: [ ],
   },
@@ -54,6 +55,9 @@ var appVue = new Vue({
       });
       ipbus_read(oh_scan_reg(9), function(data) {
         appVue.status.scan = data;
+      });
+      ipbus_read(oh_ultra_reg(32), function(data) {
+        appVue.status.ultra = data;
       });
     }
   }

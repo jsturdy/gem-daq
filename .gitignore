@@ -56,6 +56,8 @@ web-daq/build/Release
 
 # Ignore node_modules
 web-daq/node_modules
+daq/node_modules
+daq/bower_components
 
 # Debug log from npm
 web-daq/npm-debug.log

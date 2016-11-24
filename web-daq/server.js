@@ -52,6 +52,10 @@ module.exports = function(ipaddr, useUDP) {
       res.render("ultra.html", { js: "ultra" });
   });
 
+  app.get("/rates", function (req, res) {
+      res.render("rates.html", { js: "rates" });
+  });
+
   app.get("/t1", function (req, res) {
       res.render("t1.html", { js: "t1" });
   });

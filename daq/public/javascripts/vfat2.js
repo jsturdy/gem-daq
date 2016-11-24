@@ -2,7 +2,6 @@ var appVue = new Vue({
   el: 'section.content',
   data: {
     vfat2s: [ ],
-    readout: [ ],
     selected: ((window.location.href.split('/'))[4] === undefined ? -1 : (window.location.href.split('/'))[4]),
     params: {
       ctrl0: 55,
@@ -25,6 +24,7 @@ var appVue = new Vue({
           id: i,
           isPresent: false,
           isOn: false,
+          isMasked: false,
           ctrl0: 0,
           ctrl1: 0,
           ctrl2: 0,
@@ -44,12 +44,6 @@ var appVue = new Vue({
           vcal: 0,
           calphase: 0
         });
-        this.readout.push({
-          id: i,
-          good: 0,
-          bad: 0,
-          masked: false
-        });
       }
       this.get();
     },
@@ -63,14 +57,8 @@ var appVue = new Vue({
       ipbus_fifoRead(oh_ei2c_reg(257), 24, function(data) {
         for (var i = 0; i < data.length; ++i) appVue.vfat2s[i].isOn = (((data[i] & 0xF000000) >> 24) == 0x5 || (data[i] & 0x1) == 0 ? false : true);
       });
-      ipbus_blockRead(oh_counter_reg(36), 48, function(data) {
-        for (var i = 0; i < 24; ++i) {
-          appVue.readout[i].good = data[i] >>> 0;
-          appVue.readout[i].bad = data[i + 24] >>> 0;
-        }
-      });
       ipbus_read(oh_system_reg(0), function(data) {
-        for (var i = 0; i < 24; ++i) appVue.readout[i].masked = (((data >> i) & 0x1) == 1 ? true : false);
+        for (var i = 0; i < 24; ++i) appVue.vfat2s[i].isMasked = (((data >> i) & 0x1) == 1 ? true : false);
       });
       if (this.selected != -1) this.getVFAT2(this.selected);
     },
@@ -129,13 +117,13 @@ var appVue = new Vue({
       ipbus_write(oh_ei2c_reg(0), 0);
       this.get();
     },
-    toggleMask: function(vfat2) {
+    toggleMask: function() {
       ipbus_read(oh_system_reg(0), function(data) {
-        var bit = ((data >> vfat2) & 0x1);
-        if (bit == 1) data &= ~(0x1 << vfat2);
-        else data |= (0x1 << vfat2);
+        var bit = ((data >> appVue.selected) & 0x1);
+        if (bit == 1) data &= ~(0x1 << appVue.selected);
+        else data |= (0x1 << appVue.selected);
         ipbus_write(oh_system_reg(0), data);
-        appVue.readout[vfat2].masked = !appVue.readout[vfat2].masked;
+        appVue.vfat2s[appVue.selected].isMasked = !appVue.vfat2s[appVue.selected].isMasked;
       });
     },
     resetCounters: function() {
