@@ -51,13 +51,13 @@ var appVue = new Vue({
         for (var i = 0; i < data.length; ++i) appVue.vfat2s[i].isOn = (((data[i] & 0xF000000) >> 24) == 0x5 || (data[i] & 0x1) == 0 ? false : true);
       });
       ipbus_read(oh_t1_reg(14), function(data) {
-        appVue.status.t1 = (data == 0 ? false : true);
+        appVue.status.t1 = ((data 0xf) == 0 ? false : true);
       });
       ipbus_read(oh_scan_reg(9), function(data) {
-        appVue.status.scan = data;
+        appVue.status.scan = (data 0xf);
       });
       ipbus_read(oh_ultra_reg(32), function(data) {
-        appVue.status.ultra = data;
+        appVue.status.ultra = (data & 0xf);
       });
     }
   }

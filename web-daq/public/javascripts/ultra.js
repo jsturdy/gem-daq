@@ -62,7 +62,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
 
     function check_results() {
         socket.ipbus_read(oh_ultra_reg(OHID, 32), function(data) {
-            $scope.scanStatus = (data == 0 ? 2 : 1);
+            $scope.scanStatus = ((data & 0xf) == 0 ? 2 : 1);
             if ($scope.scanStatus == 2) {
                 var mask = parseInt($scope.mask, 16);
                 for (var i = 0; i < 24; ++i) {

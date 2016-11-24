@@ -58,7 +58,7 @@ app.controller('appCtrl', ['$scope', 'socket', 'Notification', function($scope, 
 
     function check_results() {
         socket.ipbus_read(oh_scan_reg(OHID, 9), function(data) {
-            $scope.scanStatus = (data == 0 ? 2 : 1);
+            $scope.scanStatus = ((data & 0xf) == 0 ? 2 : 1);
             if ($scope.scanStatus == 2) plot_results();
             else setTimeout(check_results, 500);
         });
