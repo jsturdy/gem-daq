@@ -37,37 +37,47 @@ var appVue = new Vue({
     get: function() {
       ipbus_blockRead(oh_counter_reg(0), 166, function(data) {
         // Time
-        var timestamp = data[117] >>> 0;
-        if (timestamp < appVue.timestamp) appVue.delta = (0xFFFFFFFF - appVue.timestamp + timestamp) >>> 0;
-        else appVue.delta = (timestamp - appVue.timestamp) >>> 0;
-        appVue.timestamp = timestamp;
+        var current = (data[117] >>> 0);
+        var old = (appVue.timestamp >>> 0);
+        var pos = ((current - old) >>> 0);
+        var neg = ((0xFFFFFFFF - old + current) >>> 0);
+        appVue.delta = ((current < old) ? neg : pos);
+        appVue.timestamp = current;
         for (var i = 0; i < 24; ++i) {
           // Trigger
-          var trigger = (data[118 + i] >>> 0);
-          if (trigger < appVue.vfat2s[i].trigger) var rTrigger = ((0xFFFFFFFF - ((appVue.vfat2s[i].trigger + trigger) >>> 0)) / appVue.delta * 40000).toFixed(2);
-          else var rTrigger = (((trigger - appVue.vfat2s[i].trigger) >>> 0) / appVue.delta * 40000).toFixed(2);
-          appVue.vfat2s[i].trigger = trigger;
-          appVue.vfat2s[i].dTrigger = rTrigger;
-          appVue.chartTrigger.data.datasets[i].data.push(rTrigger);
+          var current = (data[118 + i] >>> 0);
+          var old = (appVue.vfat2s[i].trigger >>> 0);
+          var pos = ((current - old) >>> 0);
+          var neg = ((0xFFFFFFFF - old + current) >>> 0);
+          var update = (((current < old) ? neg : pos) / appVue.delta * 40000).toFixed(2);
+          appVue.vfat2s[i].trigger = current;
+          appVue.vfat2s[i].dTrigger = update;
+          appVue.chartTrigger.data.datasets[i].data.push(update);
           // Trigger
-          var tracking = (data[142 + i] >>> 0);
-          if (tracking < appVue.vfat2s[i].tracking) var rTracking = ((0xFFFFFFFF - ((appVue.vfat2s[i].tracking + tracking) >>> 0)) / appVue.delta * 40000000).toFixed(2);
-          else var rTracking = (((tracking - appVue.vfat2s[i].tracking) >>> 0) / appVue.delta * 40000000).toFixed(2);
-          appVue.vfat2s[i].tracking = tracking;
-          appVue.vfat2s[i].dTracking = rTracking;
-          appVue.chartTracking.data.datasets[i].data.push(rTracking);
+          var current = (data[142 + i] >>> 0);
+          var old = (appVue.vfat2s[i].tracking >>> 0);
+          var pos = ((current - old) >>> 0);
+          var neg = ((0xFFFFFFFF - old + current) >>> 0);
+          var update = (((current < old) ? neg : pos) / appVue.delta * 40000000).toFixed(2);
+          appVue.vfat2s[i].tracking = current;
+          appVue.vfat2s[i].dTracking = update;
+          appVue.chartTracking.data.datasets[i].data.push(update);
           // Good TK
-          var good = (data[36 + i] >>> 0);
-          if (good < appVue.vfat2s[i].good) var rGood = (((0xFFFFFFFF - appVue.vfat2s[i].good + good) >>> 0) / appVue.delta * 40000000).toFixed(2);
-          else var rGood = (((good - appVue.vfat2s[i].good) >>> 0) / appVue.delta * 40000000).toFixed(2);
-          appVue.vfat2s[i].good = good;
-          appVue.vfat2s[i].dGood = rGood;
+          var current = (data[36 + i] >>> 0);
+          var old = (appVue.vfat2s[i].good >>> 0);
+          var pos = ((current - old) >>> 0);
+          var neg = ((0xFFFFFFFF - old + current) >>> 0);
+          var update = (((current < old) ? neg : pos) / appVue.delta * 40000000).toFixed(2);
+          appVue.vfat2s[i].good = current;
+          appVue.vfat2s[i].dGood = update;
           // Bad TK
-          var bad = (data[60 + i] >>> 0);
-          if (bad < appVue.vfat2s[i].bad) var rBad = (((0xFFFFFFFF - appVue.vfat2s[i].bad + bad) >>> 0) / appVue.delta * 40000000).toFixed(2);
-          else var rBad = (((bad - appVue.vfat2s[i].bad) >>> 0) / appVue.delta * 40000000).toFixed(2);
-          appVue.vfat2s[i].bad = bad;
-          appVue.vfat2s[i].dBad = rBad;
+          var current = (data[60 + i] >>> 0);
+          var old = (appVue.vfat2s[i].bad >>> 0);
+          var pos = ((current - old) >>> 0);
+          var neg = ((0xFFFFFFFF - old + current) >>> 0);
+          var update = (((current < old) ? neg : pos) / appVue.delta * 40000000).toFixed(2);
+          appVue.vfat2s[i].bad = current;
+          appVue.vfat2s[i].dBad = update;
         }
         if (appVue.chartTrigger.data.labels.length > 40) {
           appVue.chartTrigger.data.labels.shift();

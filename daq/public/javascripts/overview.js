@@ -5,12 +5,20 @@ var appVue = new Vue({
       { name: 'GLIB', version: '', date: '' },
       { name: 'OptoHybrid', version: '', date: '' }
     ],
-    status: {
-      t1: false,
-      scan: false,
-      ultra: false
+    t1: false,
+    scan: {
+      running: false,
+      type: false,
+      ready: false,
+      error: false
     },
-    vfat2s: [ ],
+    ultra: {
+      running: false,
+      type: false,
+      ready: false,
+      error: false
+    },
+    vfat2s: [ ]
   },
   methods: {
     init: function() {
@@ -51,13 +59,19 @@ var appVue = new Vue({
         for (var i = 0; i < data.length; ++i) appVue.vfat2s[i].isOn = (((data[i] & 0xF000000) >> 24) == 0x5 || (data[i] & 0x1) == 0 ? false : true);
       });
       ipbus_read(oh_t1_reg(14), function(data) {
-        appVue.status.t1 = ((data 0xf) == 0 ? false : true);
+        appVue.t1 = ((data & 0xf) == 0 ? false : true);
       });
       ipbus_read(oh_scan_reg(9), function(data) {
-        appVue.status.scan = (data 0xf);
+        appVue.scan.running = ((data & 0xf) != 0);
+        appVue.scan.type = (data & 0xf);
+        appVue.scan.error = (((data >> 4) & 0x1) == 1);
+        appVue.scan.ready = (((data >> 5) & 0x1) == 1);
       });
       ipbus_read(oh_ultra_reg(32), function(data) {
-        appVue.status.ultra = (data & 0xf);
+        appVue.ultra.running = ((data & 0xf) != 0);
+        appVue.ultra.type = (data & 0xf);
+        appVue.ultra.error = (((data >> 4) & 0x1) == 1);
+        appVue.ultra.ready = (((data >> 5) & 0x1) == 1);
       });
     }
   }

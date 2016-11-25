@@ -213,18 +213,18 @@ var appVue = new Vue({
           appVue.linkCounters[0].cnt = data[20] >>> 0;
           appVue.linkCounters[1].cnt = data[21] >>> 0;
       });
-      ipbus_blockRead(oh_counter_reg(109), 7, function(data) {
-          appVue.wbCounters[0].stb = data[0] >>> 0;
-          appVue.wbCounters[0].ack = data[1] >>> 0;
-          appVue.t1Counters[0].cnt = data[2] >>> 0;
-          appVue.t1Counters[1].cnt = data[3] >>> 0;
-          appVue.t1Counters[2].cnt = data[4] >>> 0;
-          appVue.t1Counters[3].cnt = data[5] >>> 0;
-          appVue.linkCounters[2].cnt = data[6] >>> 0;
-    });
-      ipbus_blockRead(oh_counter_reg(107), 2, function(data) {
+      ipbus_blockRead(oh_counter_reg(107), 9, function(data) {
           appVue.statRegs[1].data1 = data[0] >>> 0;
           appVue.statRegs[2].data1 = data[1] >>> 0;
+          appVue.wbCounters[0].stb = data[2] >>> 0;
+          appVue.wbCounters[0].ack = data[3] >>> 0;
+          appVue.t1Counters[0].cnt = data[4] >>> 0;
+          appVue.t1Counters[1].cnt = data[5] >>> 0;
+          appVue.t1Counters[2].cnt = data[6] >>> 0;
+          appVue.t1Counters[3].cnt = data[7] >>> 0;
+          appVue.linkCounters[2].cnt = data[8] >>> 0;
+    });
+      ipbus_blockRead(oh_counter_reg(107), 2, function(data) {
       });
     },
     resetStatCounters: function() {

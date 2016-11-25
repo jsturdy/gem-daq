@@ -13,7 +13,7 @@ var pug = require('pug'); // Template engine
 var helmet = require('helmet'); // Security
 var compression = require('compression'); // Compresses response using gzip
 var socketio = require('socket.io')(server); // Socket.io
-var ipbus = require('./ipbus')(socketio, '192.168.0.161', true); // Socket.io
+var ipbus = require('./ipbus')(socketio); // Socket.io
 
 var sessionStore = new memoryStore();
 
@@ -66,7 +66,6 @@ socketio.on('connection', function (socket) {
     socket.request.session.optohybrid = i[0];
     socket.request.session.ipbusBlock = i[1];
     sessionStore.set(socket.request.session.uid, socket.request.session);
-    console.log('>>', socket.request.session)
   });
 });
 app.get('/', function(req, res) { res.render('overview'); });

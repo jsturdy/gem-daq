@@ -65,25 +65,26 @@ var appVue = new Vue({
       this.get();
     },
     read: function() {
-      if (!this.ready) return;
       this.ready = false;
+      var first = true;
+      this.chart.data.labels = [ ];
       for (var i = 0; i < 24; ++i) {
         this.chart.data.datasets[i].data = [ ];
         if (((this.masked >> i) & 0x1) == 1) continue;
-        this.update(i);
+        this.update(i, first);
+        first = false;
       }
     },
-    update: function(i) {
-      this.chart.data.labels = [ ];
-      ipbus_fifoRead(oh_ultra_reg(8 + i), (this.max - this.min + 1), function(data) {
+    update: function(i, labels) {
+      ipbus_fifoRead(oh_ultra_reg(8 + i), (this.max - this.min - 1), function(data) {
         for (var j = 0; j < data.length; ++j) {
-          appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
+          if (labels) appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
           appVue.chart.data.datasets[i].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
         }
       });
       ipbus_fifoRead(oh_ultra_reg(8 + i), 2, function(data) {
         for (var j = 0; j < data.length; ++j) {
-          appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
+          if (labels) appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
           appVue.chart.data.datasets[i].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
         }
         appVue.chart.update();

@@ -65,6 +65,8 @@ var appVue = new Vue({
       var packet4 = this.buffer.shift();
       var packet5 = this.buffer.shift();
       var packet6 = this.buffer.shift();
+      var ohBC = ((0xfff00000 & packet6) >> 12) >>> 0;
+      var ohEC = (0xfffff & packet6) >>> 0;
       var bc = ((0x0fff0000 & packet0) >> 16) >>> 0;
       var ec = ((0x00000ff0 & packet0) >> 4) >>> 0;
       var flags = (packet0 & 0xf) >>> 0;
@@ -76,7 +78,8 @@ var appVue = new Vue({
       var crc = (0x0000ffff & packet5) >>> 0;
       if (this.events.length >= 20) this.events.shift();
       this.events.push({
-        bx: packet6,
+        ohBC: ohBC,
+        ohEC: ohEC,
         bc: bc,
         ec: ec,
         flags: flags,

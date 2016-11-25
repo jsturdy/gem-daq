@@ -61,7 +61,6 @@ var appVue = new Vue({
       this.get();
     },
     read: function() {
-      if (!this.ready) return;
       this.ready = false;
       this.update();
     },

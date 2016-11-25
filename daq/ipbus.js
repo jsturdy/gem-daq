@@ -2,7 +2,7 @@
  * Socket IO interface
  */
 
-module.exports = function(io, ipaddr, useUDP) {
+module.exports = function(io) {
 
     var fs = require('fs');
     var path = require('path');
@@ -14,8 +14,8 @@ module.exports = function(io, ipaddr, useUDP) {
     var net = require('net');
     var client = new net.Socket();
 
-    var ipaddr = (typeof ipaddr !== 'undefined') ?  ipaddr : '192.168.0.161';
-    var useUDP = (typeof useUDP !== 'undefined') ?  useUDP : true;
+    var ipaddr = (process.env.IPADDR || '192.168.0.161');
+    var useUDP = (process.env.UDP || true);
     var port = 50001;
 
     var packets = new Array();
