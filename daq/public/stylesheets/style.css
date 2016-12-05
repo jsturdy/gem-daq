@@ -1,0 +1,27 @@
+.sidebar-opts {
+  padding: 20px; }
+  .sidebar-opts label {
+    color: #fff; }
+
+h3.box-title span {
+  margin-left: 20px; }
+
+.vfat2-item {
+  display: inline-block;
+  width: 12.5%; }
+  .vfat2-item a.btn {
+    border-radius: 0; }
+
+.vfat2-edit {
+  width: 100px; }
+  .vfat2-edit input {
+    height: 20px;
+    width: 50px; }
+  .vfat2-edit a {
+    cursor: pointer; }
+    .vfat2-edit a > span {
+      float: right;
+      margin-top: 2px;
+      margin-left: 10px; }
+
+/*# sourceMappingURL=style.css.map */
