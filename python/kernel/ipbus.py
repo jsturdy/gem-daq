@@ -23,7 +23,7 @@ class GLIB:
         except ChipsException, e:
             pass
 
-    def set(self, register, value): 
+    def set(self, register, value):
         try:
             return self.ipbus.write(register, value)
         except ChipsException,e:
@@ -50,5 +50,17 @@ class GLIB:
     def blockWrite(self, register, data):
         try:
             return self.ipbus.blockWrite(register, depth)
+        except ChipsException,e:
+            pass
+
+    def get2OH(self, opto, register):
+        try:
+            return self.ipbus.read(register, ((opto & 0xf) << 20))
+        except ChipsException, e:
+            pass
+
+    def set2OH(self, opto, register, value):
+        try:
+            return self.ipbus.write(register, value, ((opto & 0xf) << 20))
         except ChipsException,e:
             pass

@@ -14,7 +14,7 @@ module.exports = function(io) {
     var net = require('net');
     var client = new net.Socket();
 
-    var ipaddr = (process.env.IPADDR || '192.168.0.161');
+    var ipaddr = (process.env.IPADDR || '137.138.115.185');
     var useUDP = (process.env.UDP || true);
     var port = 50001;
 

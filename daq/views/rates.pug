@@ -1,0 +1,37 @@
+extends index
+
+block vars
+  - var title = 'Data Rates'
+
+block scripts
+  script(src='/javascripts/rates.js')
+
+block content
+  .row
+    .col-md-4
+      //- Readout control
+      .box.box-widget
+        .box-header: h3.box-title Instanteneous Rates
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th VFAT2
+              th Trigger Bits
+              th Tracking Bits
+              th Valid Data
+              th Corrupted Data
+            tr(v-for='vfat2 in vfat2s', v-if='vfat2.isPresent')
+              td {{ vfat2.id }}
+              td {{ vfat2.dTrigger }} kHz
+              td {{ vfat2.dTracking }} Hz
+              td {{ vfat2.dGood }} Hz
+              td {{ vfat2.dBad }} Hz
+    .col-md-8
+      .box.box-widget
+        .box-header: h3.box-title Trigger Data Rates
+        .box-body
+          canvas#trigger
+      .box.box-widget
+        .box-header: h3.box-title Tracking Data Rates
+        .box-body
+          canvas#tracking

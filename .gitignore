@@ -16,6 +16,9 @@
 !*.js
 !*.css
 !*.json
+!*.pug
+!*.sass
+!*.css.map
 
 # Don't ignore fonts
 !*.svg
@@ -23,6 +26,7 @@
 !*.woff
 !*.woff2
 !*.ttf
+!daq/bin/www
 
 .DS_Store
 data/
