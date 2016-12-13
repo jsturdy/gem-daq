@@ -1,0 +1,74 @@
+extends index
+
+block vars
+  - var title = 'GLIB Control and Monitoring'
+
+block scripts
+  script(src='/javascripts/glib.js')
+
+block content
+  .row
+    .col-md-4
+      //- Networking
+      .box.box-widget
+        .box-header: h3.box-title Network Information
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              td MAC Address
+              td {{ network[0] }}
+            tr
+              td IP Address
+              td {{ network[1] }}
+      //- Stats
+      .box.box-widget
+        .box-header: h3.box-title Status registers
+        .box-body.no-padding
+          table.table.table-striped
+            tr(v-for='reg in statRegs')
+              td {{ reg.name }}
+              td {{ reg.data }}
+
+    .col-md-4
+      //- IPBus Counters
+      .box.box-widget
+        .box-header: h3.box-title IPBus Counters
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th Module
+              th Strobes
+              th Acks
+            tr(v-for='counter in ipbusCounters', v-bind:class='{ warning: counter.stb != counter.ack }')
+              td {{ counter.name }}
+              td {{ counter.stb }}
+              td {{ counter.ack }}
+        .box-footer
+          a.btn.bg-navy.btn-flat(v-on:click='resetIpbusCounters') Reset the counters
+      //- T1 Counters
+      .box.box-widget
+        .box-header: h3.box-title T1 Counters
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th Command
+              th Count
+            tr(v-for='counter in t1Counters')
+              td {{ counter.name }}
+              td {{ counter.cnt }}
+        .box-footer
+          a.btn.bg-navy.btn-flat(v-on:click='resetT1Counters') Reset the counters
+    //- GTX Counters
+    .col-md-4
+      .box.box-widget
+        .box-header: h3.box-title GTX Error Counters
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th Command
+              th Count
+            tr(v-for='counter in gtxCounters')
+              td {{ counter.name }}
+              td {{ counter.cnt }}
+        .box-footer
+          a.btn.bg-navy.btn-flat(v-on:click='resetGTXCounters') Reset the counters

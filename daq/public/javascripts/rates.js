@@ -12,6 +12,7 @@ var appVue = new Vue({
       for (var i = 0; i < 24; ++i) {
         this.vfat2s.push({
           id: i,
+          isPresent: false,
           trigger: 0,
           tracking: 0,
           good: 0,
@@ -22,6 +23,10 @@ var appVue = new Vue({
           dBad: 0
         })
       }
+      ipbus_read(oh_ei2c_reg(8));
+      ipbus_fifoRead(oh_ei2c_reg(257), 24, function(data) {
+        for (var i = 0; i < data.length; ++i) appVue.vfat2s[i].isPresent = ((data[i] >> 16) == 0x3 ? false : true);
+      });
       ipbus_blockRead(oh_counter_reg(0), 166, function(data) {
         appVue.timestamp = data[117] >>> 0;
         for (var i = 0; i < 24; ++i) {
@@ -44,6 +49,7 @@ var appVue = new Vue({
         appVue.delta = ((current < old) ? neg : pos);
         appVue.timestamp = current;
         for (var i = 0; i < 24; ++i) {
+          if (!appVue.vfat2s[i].isPresent) continue;
           // Trigger
           var current = (data[118 + i] >>> 0);
           var old = (appVue.vfat2s[i].trigger >>> 0);

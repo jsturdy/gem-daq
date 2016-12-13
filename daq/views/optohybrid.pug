@@ -1,0 +1,133 @@
+extends index
+
+block vars
+  - var title = 'OptoHybrid Control and Monitoring'
+
+block scripts
+  script(src='/javascripts/optohybrid.js')
+
+block content
+  .row
+    .col-md-8
+      //- Networking
+      .box.box-widget
+        .box-header: h3.box-title System Registers
+        .box-body
+          .row
+            .col-md-4
+              .form-group
+                label Reference Clock
+                select.form-control(v-model='clkSourceSelected'): option(v-for='option in clkSourceOptions', v-bind:value='option.id') {{ option.name }}
+              .form-group
+                label T1 Source
+                select.form-control(v-model='t1SourceSelected'): option(v-for='option in t1SourceOptions', v-bind:value='option.id') {{ option.name }}
+              .form-group
+                label Loopback Trigger Source
+                input.form-control(type='number', maxlength='2', min='0', max='23', v-model='loopbackSource')
+              .form-group
+                label Trigger Throttling
+                input.form-control(type='number', v-model='triggerThrottling')
+            .col-md-4
+              .form-group
+                label TDC SBit mode
+                select.form-control(v-model='sbitModeSelected'): option(v-for='option in sbitModeOptions', v-bind:value='option.id') {{ option.name }}
+              .form-group
+                label TDC SBit outputs
+                .input-group
+                  .input-group-addon: b 0
+                  input.form-control(type='number', maxlength='2', min='0', max='23', v-model='sbitSelect[0]', :disabled='sbitModeSelected > 1')
+                .input-group
+                  .input-group-addon: b 1
+                  input.form-control(type='number', maxlength='2', min='0', max='23', v-model='sbitSelect[1]', :disabled='sbitModeSelected > 1')
+                .input-group
+                  .input-group-addon: b 2
+                  input.form-control(type='number', maxlength='2', min='0', max='23', v-model='sbitSelect[2]', :disabled='sbitModeSelected > 1')
+                .input-group
+                  .input-group-addon: b 3
+                  input.form-control(type='number', maxlength='2', min='0', max='23', v-model='sbitSelect[3]', :disabled='sbitModeSelected > 1')
+                .input-group
+                  .input-group-addon: b 4
+                  input.form-control(type='number', maxlength='2', min='0', max='23', v-model='sbitSelect[4]', :disabled='sbitModeSelected > 1')
+                .input-group
+                  .input-group-addon: b 5
+                  input.form-control(type='number', maxlength='2', min='0', max='23', v-model='sbitSelect[5]', :disabled='sbitModeSelected > 1')
+            .col-md-4
+              .form-group
+                label VFAT2 Tracking Data Mask
+                .input-group
+                  .input-group-addon: b 0x
+                  input.form-control(type='text', maxlength='6', v-model='trackingMask')
+              .form-group
+                label VFAT2 Trigger Data Mask
+                .input-group
+                  .input-group-addon: b 0x
+                  input.form-control(type='text', maxlength='6', v-model='triggerMask')
+              .form-group.checkbox.checkbox-success
+                input(type='checkbox', v-model='zeroSuppress')
+                label: b VFAT2 Zero Suppress
+              .form-group.checkbox.checkbox-success
+                input(type='checkbox', v-model='crcSuppress')
+                label: b VFAT2 CRC Suppress
+        .box-footer
+          a.btn.bg-olive.btn-flat(v-on:click='apply') Apply
+    .col-md-4
+      //- T1 Counters
+      .box.box-widget
+        .box-header: h3.box-title Status Registers
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th Register
+              th Version / Locked
+              th Date / Counter
+            tr(v-for='reg in statRegs')
+              td {{ reg.name }}
+              td {{ reg.data0 }}
+              td {{ reg.data1 }}
+        .box-footer
+          a.btn.bg-navy.btn-flat(v-on:click='resetStatCounters') Reset the counters
+  .row
+    .col-md-4
+      //- Wishbone Counters
+      .box.box-widget
+        .box-header: h3.box-title Wishbone Counters
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th Module
+              th Strobes
+              th Acks
+            tr(v-for='counter in wbCounters', v-bind:class='{ warning: counter.stb != counter.ack }')
+              td {{ counter.name }}
+              td {{ counter.stb }}
+              td {{ counter.ack }}
+        .box-footer
+          a.btn.bg-navy.btn-flat(v-on:click='resetWishboneCounters') Reset the counters
+    .col-md-4
+      //- T1 Counters
+      .box.box-widget
+        .box-header: h3.box-title T1 Counters
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th Command
+              th Count
+            tr(v-for='counter in t1Counters')
+              td {{ counter.name }}
+              td {{ counter.cnt }}
+        .box-footer
+          a.btn.bg-navy.btn-flat(v-on:click='resetT1Counters') Reset the counters
+    .col-md-4
+      //- Optical Links Counters
+      .box.box-widget
+        .box-header: h3.box-title GBT and GTX Counters
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th Command
+              th Count
+            tr(v-for='counter in linkCounters')
+              td {{ counter.name }}
+              td {{ counter.cnt }}
+        .box-footer
+          a.btn.bg-navy.btn-flat(v-on:click='resetLinkCounters') Reset the counters

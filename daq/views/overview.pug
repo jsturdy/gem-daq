@@ -1,0 +1,100 @@
+extends index
+
+block vars
+  - var title = 'Overview'
+
+block scripts
+  script(src='/javascripts/overview.js')
+
+block content
+  .row
+    .col-md-4
+      .box.box-widget
+        .box-header: h3.box-title System Information
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th Component
+              th version
+              th Date
+            tr(v-for='system in systems')
+              td {{ system.name }}
+              td {{ system.version }}
+              td {{ system.date }}
+      .box.box-widget
+        .box-header: h3.box-title GLIB Readout
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              td OptoHybrid transmitted
+              td {{ sent }}
+            tr
+              td GLIB received
+              td {{ received }}
+            tr
+              td Available for readout
+              td {{ available }}
+            tr
+              td FIFO in use
+              td {{ Math.round(available / 16383 * 100) }}%
+    .col-md-4
+      .box.box-widget
+        .box-header: h3.box-title Firmware Modules
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th Module
+              th Status
+            tr
+              td T1 Generator
+              td
+                span.label.bg-olive(v-if='t1') Running
+                span.label.bg-maroon(v-else) Halted
+            tr
+              td Scan Modules
+              td
+                span.label.bg-olive(v-if='scan.running') Running
+                span.label.bg-maroon(v-else) Halted
+                span.label.bg-orange(v-if='scan.error') Error
+                span.label.bg-teal(v-if='!scan.running && scan.ready') Ready
+                span.label.bg-navy(v-if='scan.type == 1') Threshold scan
+                span.label.bg-navy(v-if='scan.type == 2') Threshold scan by channel
+                span.label.bg-navy(v-if='scan.type == 5') Threshold scan using tracking data
+                span.label.bg-navy(v-if='scan.type == 3') Latency scan
+                span.label.bg-navy(v-if='scan.type == 4') S-Curve scan
+            tr
+              td Parallel Scan Modules
+              td
+                span.label.bg-olive(v-if='ultra.running') Running
+                span.label.bg-maroon(v-else) Halted
+                span.label.bg-orange(v-if='ultra.error') Error
+                span.label.bg-teal(v-if='!ultra.running && ultra.ready') Ready
+                span.label.bg-navy(v-if='ultra.type == 1') Threshold scan
+                span.label.bg-navy(v-if='ultra.type == 2') Threshold scan by channel
+                span.label.bg-navy(v-if='ultra.type == 5') Threshold scan using tracking data
+                span.label.bg-navy(v-if='ultra.type == 3') Latency scan
+                span.label.bg-navy(v-if='ultra.type == 4') S-Curve scan
+      .box.box-widget
+        .box-header: h3.box-title Temperature Monitoring
+        .box-body
+          canvas#temperature
+    .col-md-4
+      //- VFAT2s
+      .box.box-widget
+        .box-header: h3.box-title VFAT2s
+        .box-body.no-padding
+          span.vfat2-item(v-for='vfat2 in vfat2s')
+            a.btn.btn-block.btn-xs(v-bind:href='"/VFAT2s/" + vfat2.id', v-bind:class='{ "bg-olive": vfat2.isPresent && vfat2.isOn, "bg-maroon": vfat2.isPresent && !vfat2.isOn, "bg-gray": !vfat2.isPresent }', :disabled='!vfat2.isPresent') {{ vfat2.id }}
+      //- Quality
+      .box.box-widget
+        .box-header: h3.box-title Data Quality
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th VFAT2
+              th Valid
+              th Corrupted
+            tr(v-for='vfat2 in vfat2s', v-if='vfat2.isPresent', v-bind:class='{ warning: vfat2.bad != 0 }')
+              td \#{{ vfat2.id }}
+              td {{ vfat2.good }}
+                  td {{ vfat2.bad }}

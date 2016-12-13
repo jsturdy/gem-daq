@@ -1,0 +1,90 @@
+extends index
+
+block vars
+  - var title = 'Data Quality Monitoring'
+
+block scripts
+  script(src='/javascripts/dqm.js')
+
+block content
+  .row
+    .col-md-3
+      //- Readout control
+      .box.box-widget
+        .box-header: h3.box-title Readout Control
+        .box-body
+          a.btn.bg-olive.btn-flat(v-on:click='start', :disabled='running') Start acquisition
+          a.btn.bg-maroon.btn-flat(v-on:click='stop', :disabled='!running') Stop acquisition
+      //- Statistics
+      .box.box-widget
+        .box-header: h3.box-title Statistics
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              td Acquired events
+              td {{ acquired }}
+            tr
+              td OptoHybrid transmitted
+              td {{ sent }}
+            tr
+              td GLIB received
+              td {{ received }}
+            tr
+              td Available for readout
+              td {{ available }}
+            tr
+              td FIFO in use
+              td {{ Math.round(available / 16383 * 100) }}%
+        .box-footer
+          a.btn.bg-navy.btn-flat(v-on:click='empty') Empty the buffers
+      //- Quality
+      .box.box-widget
+        .box-header: h3.box-title Data Quality
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th VFAT2
+              th Valid
+              th Corrupted
+            tr(v-for='vfat2 in vfat2s', v-if='vfat2.isPresent')
+              td \#{{ vfat2.id }}
+              td {{ vfat2.good }}
+              td {{ vfat2.bad }}
+        .box-footer
+          a.btn.bg-navy.btn-flat(v-on:click='reset') Reset the counters
+    .col-md-9
+      //- Plots
+      .box.box-widget
+        .box-header: h3.box-title Plots
+        .box-body
+          .row
+            .col-md-6: canvas#bc
+            .col-md-6: canvas#ec
+          .row
+            .col-md-6: canvas#flags
+            .col-md-6: canvas#chipid
+          .row
+            .col-md-12: canvas#strips
+      //- Events
+      .box.box-widget
+        .box-header: h3.box-title Events
+        .box-body.no-padding
+          table.table.table-striped
+            tr
+              th OH BC
+              th BC
+              th OH EC
+              th EC
+              th Flags
+              th ChipID
+              th Strips
+              th CRC
+            tr(v-for='event in events')
+              td {{ event.ohBC }}
+              td {{ event.bc }}
+              td {{ event.ohEC }}
+              td {{ event.ec }}
+              td {{ event.flags }}
+              td {{ event.chipID }}
+              td {{ event.strips0 }} {{ event.strips1 }} {{ event.strips2 }} {{ event.strips3 }}
+              td {{ event.crc }}

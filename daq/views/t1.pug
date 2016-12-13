@@ -1,0 +1,48 @@
+extends index
+
+block vars
+  - var title = 'T1 Generator'
+
+block scripts
+  script(src='/javascripts/t1.js')
+
+block content
+  .row
+    .col-md-4.col-md-offset-4
+      .box.box-widget
+        .box-header: h3.box-title
+          | Controller Parameters
+          span.label.bg-olive(v-if='running') Running
+          span.label.bg-maroon(v-else) Halted
+        .box-body
+          .div(v-if='running')
+            strong Progress (estimation)
+            .progress.progress-sm.active
+              .progress-bar.progress-bar-success.progress-bar-striped(v-bind:style='{ width: progress + "%" }')
+            hr
+          .form-group
+            label Mode
+            select.form-control(v-model='mode', :disabled='running')
+              option(value='0', selected) Mode 0: repetitive commands
+              option(value='1') Mode 1: delayed Calpulse and LV1A
+          .form-group(v-if='mode == 0')
+            label Command type
+            select.form-control(v-model='type', :disabled='running')
+              option(value='0', selected) LV1A
+              option(value='1') Calpulse
+              option(value='2') Resync
+              option(value='3') BC0
+          .form-group
+            label Number of events (0 = infinite)
+            input.form-control(type='number', v-model='events', :disabled='running')
+          .form-group
+            label Interval
+            input.form-control(type='number', v-model='interval', :disabled='running')
+          .form-group
+            label Delay
+            input.form-control(type='number', v-model='delay', :disabled='running')
+        .box-footer
+          .btn-group.btn-group-justified
+            a.btn.bg-olive.btn-flat(v-on:click='start', :disabled='running') Start
+            a.btn.bg-maroon.btn-flat(v-on:click='stop', :disabled='!running') Stop
+            a.btn.bg-navy.btn-flat(v-on:click='reset') Reset

@@ -1,0 +1,58 @@
+extends index
+
+block vars
+  - var title = 'Scan Modules'
+
+block scripts
+  script(src='/javascripts/scan.js')
+
+block content
+  .row
+    .col-md-4
+      .box.box-widget
+        .box-header: h3.box-title
+          | Module Parameters
+          span.label.bg-olive(v-if='running') Running
+          span.label.bg-maroon(v-else) Halted
+          span.label.bg-orange(v-if='error') Error
+        .box-body
+          .div(v-if='running')
+            strong Progress (estimation)
+            .progress.progress-sm.active
+              .progress-bar.progress-bar-success.progress-bar-striped(v-bind:style='{ width: progress + "%" }')
+            hr
+          .form-group
+            label Type
+            select.form-control(v-model='type', :disabled='running')
+              option(value='0') Theshold scan
+              option(value='1') Theshold scan by channel
+              option(value='4') Theshold scan using tracking data
+              option(value='2') Latency scan
+              option(value='3') S-Curve scan
+            strong.helper-block.text-red(v-if='type != 0') This scan requires triggers to run.
+          .form-group
+            label VFAT2
+            input.form-control(type='number', v-model='vfat2', :disabled='running')
+          .form-group(v-if='type == 1 || type == 3')
+            label Channel
+            input.form-control(type='number', v-model='channel', :disabled='running')
+          .form-group
+            label Minimum value (default = 0)
+            input.form-control(type='number', v-model='min', :disabled='running')
+          .form-group
+            label Maximum value (default = 255)
+            input.form-control(type='number', v-model='max', :disabled='running')
+          .form-group
+            label Steps (default = 1)
+            input.form-control(type='number', v-model='step', :disabled='running')
+          .form-group
+            label Number of events (default = 0xFFFFFF)
+            input.form-control(type='number', v-model='events', :disabled='running')
+        .box-footer
+          a.btn.bg-olive.btn-flat(v-on:click='launch', :disabled='running') Launch
+          a.btn.bg-navy.btn-flat(v-on:click='reset') Reset
+    .col-md-8
+      .box.box-widget
+        .box-header: h3.box-title Results
+        .box-body
+          canvas#results

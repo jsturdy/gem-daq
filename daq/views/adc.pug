@@ -1,0 +1,79 @@
+extends index
+
+block vars
+  - var title = 'ADC Monitoring'
+
+block scripts
+  script(src='/javascripts/adc.js')
+
+block content
+  .row
+    .col-md-3
+      .box.box-widget
+        .box-header: h3.box-title ADC Request
+        .box-body
+          .form-group
+            label Register
+            select.form-control(v-model='register')
+              option(value='0', selected) Temperature
+              option(value='1') Vccint
+              option(value='2') Vccaux
+              option(value='3') VP/VN
+              option(value='16') VAUX[0]
+              option(value='17') VAUX[1]
+              option(value='18') VAUX[2]
+              option(value='19') VAUX[3]
+              option(value='20') VAUX[4]
+              option(value='21') VAUX[5]
+              option(value='22') VAUX[6]
+              option(value='23') VAUX[7]
+              option(value='24') VAUX[8]
+              option(value='25') VAUX[9]
+              option(value='26') VAUX[10]
+              option(value='27') VAUX[11]
+              option(value='28') VAUX[12]
+              option(value='29') VAUX[13]
+              option(value='30') VAUX[14]
+              option(value='31') VAUX[15]
+              option(value='32') Temperature Max
+              option(value='33') Vccint Max
+              option(value='34') Vccaux Max
+              option(value='36') Temperature Min
+              option(value='37') Vccint Min
+              option(value='38') Vccaux Min
+              option(value='64') Control Register 0
+              option(value='65') Control Register 1
+              option(value='66') Control Register 2
+              option(value='67') Test Register 0
+              option(value='68') Test Register 1
+              option(value='69') Test Register 2
+              option(value='70') Test Register 3
+              option(value='71') Test Register 4
+              option(value='72') Sequence Register 0
+              option(value='73') Sequence Register 1
+              option(value='74') Sequence Register 2
+              option(value='75') Sequence Register 3
+              option(value='76') Sequence Register 4
+              option(value='77') Sequence Register 5
+              option(value='78') Sequence Register 6
+              option(value='79') Sequence Register 7
+          .form-group
+            label Write Data
+            input.form-control(type='number', v-model='writeData')
+        .box-footer
+          .btn-group.btn-group-justified
+            a.btn.bg-navy.btn-flat(v-on:click='read') Read
+            a.btn.bg-teal.btn-flat(v-on:click='write') Write
+      .box.box-widget(v-if='result != null')
+        .box-header: h3.box-title ADC Response
+        .box-body
+          p: strong {{ result }}
+    .col-md-9
+      .box.box-widget
+        .box-header: h3.box-title Temperature
+        .box-body
+          canvas#temperature
+      .box.box-widget
+        .box-header: h3.box-title Voltage
+        .box-body
+          canvas#voltage

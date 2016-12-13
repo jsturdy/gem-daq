@@ -133,4 +133,4 @@ var appVue = new Vue({
 });
 
 appVue.init();
-setInterval(function() { appVue.get() }, 2000);
+setInterval(function() { appVue.get() }, 1000);

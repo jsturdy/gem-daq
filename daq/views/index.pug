@@ -1,0 +1,80 @@
+block vars
+  - var title = 'Dashboard'
+
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    title GEM Web DAQ
+    meta(content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no', name='viewport')
+    link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/bower_components/font-awesome/css/font-awesome.min.css')
+    link(rel='stylesheet', href='/bower_components/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css')
+    link(rel='stylesheet', href='/stylesheets/AdminLTE.min.css')
+    link(rel='stylesheet', href='/stylesheets/_all-skins.min.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body.skin-black
+
+    .wrapper
+
+      header.main-header
+        a.logo(href='/')
+          span.logo-mini Web DAQ
+          span.logo-lg Web DAQ
+        nav.navbar.navbar-static-top
+          a.sidebar-toggle(href='#', class='sidebar-toggle', data-toggle='offcanvas')
+            span.sr-only Toggle navigation
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+
+      aside.main-sidebar
+        section.sidebar
+          ul.sidebar-menu
+            li.header DASHBOARDS
+            li: a(href='/') Overview
+            li: a(href='/GLIB') GLIB
+            li: a(href='/OptoHybrid') OptoHybrid
+            li: a(href='/VFAT2s') VFAT2s
+            li.header OPTOHYBRID UTILITIES
+            li: a(href='/ADC') ADC
+            li: a(href='/T1') T1 Generator
+            li.header VFAT2 UTILITIES
+            li: a(href='/I2C') I2C
+            li: a(href='/scan-I') Scan Modules
+            li: a(href='/scan-II') Parallel Scan Modules
+            li: a(href='/rates') Data Rates
+            li: a(href='/DQM') Data Quality Monitoring
+            li.header OPTIONS
+            li
+              .sidebar-opts
+                select.form-control(v-model='optohybrid', v-on:change='change')
+                  option(v-for='i in 4', v-bind:value='i - 1') OptoHybrid {{ i - 1 }}
+                p.checkbox.checkbox-info
+                  input(type='checkbox', v-model='ipbusBlock', v-on:change='change')
+                  label Prevent IPBus Requests
+
+      .content-wrapper
+        section.content-header: h1 #{title}
+        section.content
+          block content
+
+      footer.main-footer
+        span Thomas.Lenzi@cern.ch
+
+      .control-sidebar-bg
+
+    script(src='/bower_components/jquery/dist/jquery.min.js')
+    script(src='/bower_components/bootstrap/dist/js/bootstrap.min.js')
+    script(src='/bower_components/vue/dist/vue.min.js')
+    script(src='/bower_components/moment/min/moment.min.js')
+    script(src='/bower_components/chart.js/dist/Chart.min.js')
+    script(src='/javascripts/app.min.js')
+    script(src='/socket.io/socket.io.js')
+    script
+      | var socket = io();
+      | var OptoHybrid = #{ optohybrid };
+      | var IpbusBlock = #{ ipbusBlock };
+    script(src='/javascripts/index.js')
+    block scripts

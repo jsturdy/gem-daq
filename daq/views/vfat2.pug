@@ -1,0 +1,137 @@
+extends index
+
+block vars
+  - var title = 'VFAT2s Control and Monitoring'
+
+block scripts
+  script(src='/javascripts/vfat2.js')
+
+block content
+  .row
+    .col-md-4
+      //- Overview
+      .box.box-widget
+        .box-header: h3.box-title Overview
+        .box-body.no-padding
+          span.vfat2-item(v-for='vfat2 in vfat2s')
+            a.btn.btn-block.btn-xs(v-bind:class='{ "bg-orange": vfat2.isPresent && vfat2.isMasked, "bg-olive": vfat2.isPresent && !vfat2.isMasked && vfat2.isOn, "bg-maroon": vfat2.isPresent && !vfat2.isMasked && !vfat2.isOn, "bg-gray": !vfat2.isPresent }', v-on:click='show(vfat2.id)', :disabled='!vfat2.isPresent') {{ vfat2.id }}
+        .box-footer
+          a.btn.bg-teal.btn-flat(v-on:click='applyDefaultsAll') Apply defaults
+          a.btn.bg-olive.btn-flat(v-on:click='startAll') Start all VFAT2s
+          a.btn.bg-maroon.btn-flat(v-on:click='stopAll') Stop all VFAT2s
+    .col-md-8
+      //- VFAT2 data
+      .box.box-widget(v-if='selected != -1')
+        .box-header: h3.box-title VFAT2 n°{{ selected }} Registers
+        .box-body.no-padding
+          .row
+            .col-md-4
+              table.table
+                tr
+                  th Register
+                  th Value
+                tr
+                  td ChipID
+                  td {{ vfat2s[selected].chipId }}
+                tr
+                  td Control Register 0
+                  td.vfat2-edit: a(v-on:click='edit(0, $event)')
+                    b {{ vfat2s[selected].ctrl0 }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].ctrl0 != params.ctrl0'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+                tr
+                  td Control Register 1
+                  td.vfat2-edit: a(v-on:click='edit(1, $event)')
+                    b {{ vfat2s[selected].ctrl1 }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].ctrl1 != params.ctrl1'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+                tr
+                  td Control Register 2
+                  td.vfat2-edit: a(v-on:click='edit(149, $event)')
+                    b {{ vfat2s[selected].ctrl2 }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].ctrl2 != params.ctrl2'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+                tr
+                  td Control Register 3
+                  td.vfat2-edit: a(v-on:click='edit(150, $event)')
+                    b {{ vfat2s[selected].ctrl3 }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].ctrl3 != params.ctrl3'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+            .col-md-4
+              table.table
+                tr
+                  th Register
+                  th Value
+                tr
+                  td IPreampIn
+                  td.vfat2-edit: a(v-on:click='edit(2, $event)')
+                    b {{ vfat2s[selected].iPreampIn }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].iPreampIn != params.iPreampIn'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+                tr
+                  td IPreampFeed
+                  td.vfat2-edit: a(v-on:click='edit(3, $event)')
+                    b {{ vfat2s[selected].iPremapFeed }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].iPremapFeed != params.iPremapFeed'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+                tr
+                  td IPreampOut
+                  td.vfat2-edit: a(v-on:click='edit(4, $event)')
+                    b {{ vfat2s[selected].iPreampOut }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].iPreampOut != params.iPreampOut'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+                tr
+                  td IShaper
+                  td.vfat2-edit: a(v-on:click='edit(5, $event)')
+                    b {{ vfat2s[selected].iShaper }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].iShaper != params.iShaper'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+                tr
+                  td IShaperFeed
+                  td.vfat2-edit: a(v-on:click='edit(6, $event)')
+                    b {{ vfat2s[selected].iShaperFeed }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].iShaperFeed != params.iShaperFeed'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+                tr
+                  td IComp
+                  td.vfat2-edit: a(v-on:click='edit(7, $event)')
+                    b {{ vfat2s[selected].iComp }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].iComp != params.iComp'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+            .col-md-4
+              table.table
+                tr
+                  th Register
+                  th Value
+                tr
+                  td Latency
+                  td.vfat2-edit: a(v-on:click='edit(16, $event)')
+                    b {{ vfat2s[selected].latency }}
+                    span.label.bg-orange: span.glyphicon.glyphicon-th
+                tr
+                  td VThreshold1
+                  td.vfat2-edit: a(v-on:click='edit(146, $event)')
+                    b {{ vfat2s[selected].vthreshold1 }}
+                    span.label.bg-orange: span.glyphicon.glyphicon-th
+                tr
+                  td VThreshold2
+                  td.vfat2-edit: a(v-on:click='edit(147, $event)')
+                    b {{ vfat2s[selected].vthreshold2 }}
+                    span.label.bg-maroon(v-if='vfat2s[selected].vthreshold2 != params.vthreshold2'): span.glyphicon.glyphicon-remove
+                    span.label.bg-olive(v-else): span.glyphicon.glyphicon-ok
+                tr
+                  td VCal
+                  td.vfat2-edit: a(v-on:click='edit(145, $event)')
+                    b {{ vfat2s[selected].vcal }}
+                    span.label.bg-orange: span.glyphicon.glyphicon-th
+                tr
+                  td Calibration Phase
+                  td.vfat2-edit: a(v-on:click='edit(148, $event)')
+                    b {{ vfat2s[selected].calphase }}
+                    span.label.bg-orange: span.glyphicon.glyphicon-th
+        .box-footer
+          a.btn.bg-teal.btn-flat(v-on:click='applyDefaults') Apply defaults
+          a.btn.bg-olive.btn-flat(v-on:click='start') Start the VFAT2
+          a.btn.bg-maroon.btn-flat(v-on:click='stop') Stop the VFAT2
+          a.btn.bg-orange.btn-flat(v-on:click='toggleMask') Toggle Mask
+          a.btn.bg-navy.btn-flat(v-on:click='resetChannels') Reset all the channels

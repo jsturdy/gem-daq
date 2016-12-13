@@ -39,6 +39,7 @@
                     <span class="label label-default">GEM Chamber Selection</span>
                     <div class="radio"><label><input type="radio" name="ohSelect" id="ohSelect" value="0" checked="" ng-model="OHID" ng-value="0" ng-change="oh_change()"> GEM <b>#0</b></label></div>
                     <div class="radio"><label><input type="radio" name="ohSelect" id="ohSelect" value="1" ng-model="OHID" ng-value="1" ng-change="oh_change()"> GEM <b>#1</b></label></div>
+                    <div class="checkbox"><label><input type="checkbox" ng-model="blockIPBus" ng-change="ipbus_block()"> Block IPBus requests</label></div>
                 </div>
                 <a href="#" class="btn btn-block btn-link" id="totop">Back to the top</a>
             </div>
