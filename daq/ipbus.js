@@ -14,9 +14,11 @@ module.exports = function(io) {
     var net = require('net');
     var client = new net.Socket();
 
-    var ipaddr = (process.env.IPADDR || '137.138.115.185');
-    var useUDP = (process.env.UDP || true);
-    var port = 50001;
+    var ipaddr = (process.env.NODE_IPADDR || '137.138.115.185');
+    var useUDP = (process.env.NODE_UDP === 'false' ? false : true);
+    var port = (useUDP ? 50001 : 60002);
+
+    console.log('Connecting to ' + ipaddr + ' on port ' + port + ' through ' + (useUDP ? 'UDP' : 'TCP'));
 
     var packets = new Array();
     var packet = undefined;
@@ -26,7 +28,21 @@ module.exports = function(io) {
    * Receive transactions
    */
 
-  function handleResponse(message) {
+  function handleResponse(frame) {
+      var message = [ ];
+
+      if (useUDP) {
+         message = frame;
+      }
+      else {
+        for (i = 4; i < frame.length; i += 4) {
+            message.push(frame[i + 3]);
+            message.push(frame[i + 2]);
+            message.push(frame[i + 1]);
+            message.push(frame[i]);
+        }
+      }
+
       // Response
       var response = {
           ipbusVersion: (message[0] >> 4),
@@ -36,6 +52,7 @@ module.exports = function(io) {
           infoCode: message[7] & 0xf,
           data: [ ]
       };
+      console.log(response);
       // Read
       if (response.type == 0 || response.type == 2) {
           if (response.size == 1) response.data = (message[8] << 24) | (message[9] << 16) | (message[10] << 8) | message[11];
@@ -51,7 +68,7 @@ module.exports = function(io) {
           (packet.callback)(response);
           packet = undefined;
       }
-      else console.log('UDP: received packet', response.id, 'but NO callback :(');
+      else console.log('Rreceived packet', response.id, 'but NO callback :(');
   }
 
   if (useUDP) {
@@ -59,7 +76,7 @@ module.exports = function(io) {
       udp.on('message', handleResponse);
   }
   else {
-      client.connect(port, ipaddr, function() { console.log('Connected to CTP7'); });
+      client.connect(port, ipaddr);
       client.on('data', handleResponse);
   }
 
@@ -126,184 +143,33 @@ module.exports = function(io) {
               udp_data.push(transaction.data[i] & 0x000000ff);
           }
       }
+
+    var len = 0;
+    var tcp_data = [ ];
+    for (var i = 0; i < udp_data.length; i += 4) {
+       tcp_data.push(udp_data[i + 3]);
+       tcp_data.push(udp_data[i + 2]);
+       tcp_data.push(udp_data[i + 1]);
+       tcp_data.push(udp_data[i]);
+       len += 4;
+    }
+    tcp_data.unshift(0);
+    tcp_data.unshift(0);
+    tcp_data.unshift(0);
+    tcp_data.unshift(len);
+
+    var data = (useUDP ? udp_data : tcp_data);
       packets.push({
           id: packetId++,
-          data: new Buffer(udp_data),
+          data: new Buffer(data),
           callback: callback,
           timeout: 100
       });
   }
 
-  /*
-   * Save to disk
-   */
-
-  var vfat2Status = {
-      id: 0,
-      ctrl0: 0,
-      ctrl1: 0,
-      ctrl2: 0,
-      ctrl3: 0,
-      iPreampIn: 0,
-      iPremapFeed: 0,
-      iPreampOut: 0,
-      iShaper: 0,
-      iShaperFeed: 0,
-      iComp: 0,
-      chipId0: 0,
-      chipId1: 0,
-      latency: 0,
-      vthreshold1: 0,
-      vthreshold2: 0,
-      vcal: 0,
-      calphase: 0
-  };
-
-  function vfat2_reg(oh, vfat2, reg) { return 0x40000000 + ((oh & 0xf) << 20) + ((vfat2 & 0xff) << 8) + (reg & 0xff); }
-
-  function save_threshold_latency(transaction, callback) {
-      ipbus({ type: 0, size: 10, addr: vfat2_reg(transaction.oh, transaction.vfat2, 0) }, function(data) {
-          vfat2Status.ctrl0 = data.data[0] & 0xff;
-          vfat2Status.ctrl1 = data.data[1] & 0xff;
-          vfat2Status.iPreampIn = data.data[2] & 0xff;
-          vfat2Status.iPremapFeed = data.data[3] & 0xff;
-          vfat2Status.iPreampOut = data.data[4] & 0xff;
-          vfat2Status.iShaper = data.data[5] & 0xff;
-          vfat2Status.iShaperFeed = data.data[6] & 0xff;
-          vfat2Status.iComp = data.data[7] & 0xff;
-          vfat2Status.chipId0 = data.data[8] & 0xff;
-          vfat2Status.chipId1 = data.data[9] & 0xff;
-      });
-      ipbus({ type: 0, size: 1, addr: vfat2_reg(transaction.oh, transaction.vfat2, 16) }, function(data) { vfat2Status.latency = data.data & 0xff; });
-      ipbus({ type: 0, size: 6, addr: vfat2_reg(transaction.oh, transaction.vfat2, 145) }, function(data) {
-          vfat2Status.vcal = data.data[0] & 0xff;
-          vfat2Status.vthreshold1 = data.data[1] & 0xff;
-          vfat2Status.vthreshold2 = data.data[2] & 0xff;
-          vfat2Status.calphase = data.data[3] & 0xff;
-          vfat2Status.ctrl2 = data.data[4] & 0xff;
-          vfat2Status.ctrl3 = data.data[5] & 0xff;
-
-          var now = require('moment')();
-          var fileName = "../data/" + transaction.type + "/" + now.format('YY-MM-DD-HH-mm-ss') + ".txt";
-          var content = "";
-
-          content += "Type\t" + transaction.type + "\n";
-          content += "OptoHybrid\t" + transaction.oh + "\n";
-          content += "VFAT2\t" + transaction.vfat2 + "\n";
-          content += "min\t" + transaction.min + "\n";
-          content += "max\t" + transaction.max + "\n";
-          content += "step\t" + transaction.step + "\n";
-          content += "n\t" + transaction.n + "\n";
-          content += "----\n";
-          content += "slot\t" + transaction.vfat2 + "\n";
-          content += "ctrl0\t" + vfat2Status.ctrl0 + "\n";
-          content += "ctrl1\t" + vfat2Status.ctrl1 + "\n";
-          content += "ctrl2\t" + vfat2Status.ctrl2 + "\n";
-          content += "ctrl3\t" + vfat2Status.ctrl3 + "\n";
-          content += "iPreampIn\t" + vfat2Status.iPreampIn + "\n";
-          content += "iPremapFeed\t" + vfat2Status.iPremapFeed + "\n";
-          content += "iPreampOut\t" + vfat2Status.iPreampOut + "\n";
-          content += "iShaper\t" + vfat2Status.iShaper + "\n";
-          content += "iShaperFeed\t" + vfat2Status.iShaperFeed + "\n";
-          content += "iComp\t" + vfat2Status.iComp + "\n";
-          content += "chipId0\t" + vfat2Status.chipId0 + "\n";
-          content += "chipId1\t" + vfat2Status.chipId1 + "\n";
-          content += "latency\t" + vfat2Status.latency + "\n";
-          content += "vthreshold1\t" + vfat2Status.vthreshold1 + "\n";
-          content += "vthreshold2\t" + vfat2Status.vthreshold2 + "\n";
-          content += "vcal\t" + vfat2Status.vcal + "\n";
-          content += "calphase\t" + vfat2Status.calphase + "\n";
-          content += "----\n";
-          for (var i = 0; i < transaction.data.length; ++i) content += transaction.data[i] + "\n";
-
-          fs.writeFile(fileName, content, callback);
-      });
-  }
-
-  function save_vfat2(transaction, callback) {
-      var now = require('moment')();
-      var fileName = "../data/" + transaction.type + "/" + now.format('YY-MM-DD-HH-mm-ss') + ".txt";
-      var content = "";
-
-      for (var i = 0; i < transaction.data.length; ++i) {
-          content += "--------------------" + transaction.data[i].id + "--------------------\n";
-          content += "isPresent\t" + (transaction.data[i].isPresent ? "1" : "0") + "\n";
-          content += "isOn\t" + (transaction.data[i].isOn ? "1" : "0") + "\n";
-          content += "ctrl0\t" + transaction.data[i].ctrl0 + "\n";
-          content += "ctrl1\t" + transaction.data[i].ctrl1 + "\n";
-          content += "ctrl2\t" + transaction.data[i].ctrl2 + "\n";
-          content += "ctrl3\t" + transaction.data[i].ctrl3 + "\n";
-          content += "iPreampIn\t" + transaction.data[i].iPreampIn + "\n";
-          content += "iPremapFeed\t" + transaction.data[i].iPremapFeed + "\n";
-          content += "iPreampOut\t" + transaction.data[i].iPreampOut + "\n";
-          content += "iShaper\t" + transaction.data[i].iShaper + "\n";
-          content += "iShaperFeed\t" + transaction.data[i].iShaperFeed + "\n";
-          content += "iComp\t" + transaction.data[i].iComp + "\n";
-          content += "chipId0\t" + transaction.data[i].chipId0 + "\n";
-          content += "chipId1\t" + transaction.data[i].chipId1 + "\n";
-          content += "latency\t" + transaction.data[i].latency + "\n";
-          content += "vthreshold1\t" + transaction.data[i].vthreshold1 + "\n";
-          content += "vthreshold2\t" + transaction.data[i].vthreshold2 + "\n";
-          content += "vcal\t" + transaction.data[i].vcal + "\n";
-          content += "calphase\t" + transaction.data[i].calphase + "\n";
-      }
-
-      fs.writeFile(fileName, content, callback);
-  }
-
     io.on('connection', function (socket) {
 
         socket.on('ipbus', function(transaction, callback) { ipbus(transaction, callback); });
-
-        socket.on('save', function(transaction, callback) {
-            var now = require('moment')();
-            var fileName = path.join(__dirname, '/../../data/' + transaction.type + "/" + now.format('YY-MM-DD-HH-mm-ss') + ".txt");
-            var content = "";
-
-            if (transaction.type == "threshold" || transaction.type == "latency") {
-                content += "VFAT2\t" + transaction.vfat2 + "\n";
-                content += "MIN\t" + transaction.min + "\n";
-                content += "MAX\t" + transaction.max + "\n";
-                content += "STEP\t" + transaction.step + "\n";
-                content += "N\t" + transaction.n + "\n";
-                for (var i = 0; i < transaction.data.length; ++i) content += transaction.data[i] + "\n";
-            }
-            else if (transaction.type == "scurve" || transaction.type == "threshold_channel") {
-                content += "VFAT2\t" + transaction.vfat2 + "\n";
-                content += "CHANNEL\t" + transaction.channel + "\n";
-                content += "MIN\t" + transaction.min + "\n";
-                content += "MAX\t" + transaction.max + "\n";
-                content += "STEP\t" + transaction.step + "\n";
-                content += "N\t" + transaction.n + "\n";
-                for (var i = 0; i < transaction.data.length; ++i) content += transaction.data[i] + "\n";
-            }
-            else if (transaction.type == "vfat2") {
-                for (var i = 0; i < transaction.data.length; ++i) {
-                    content += "--------------------" + transaction.data[i].id + "--------------------\n";
-                    content += "isPresent\t" + (transaction.data[i].isPresent ? "1" : "0") + "\n";
-                    content += "isOn\t" + (transaction.data[i].isOn ? "1" : "0") + "\n";
-                    content += "ctrl0\t" + transaction.data[i].ctrl0 + "\n";
-                    content += "ctrl1\t" + transaction.data[i].ctrl1 + "\n";
-                    content += "ctrl2\t" + transaction.data[i].ctrl2 + "\n";
-                    content += "ctrl3\t" + transaction.data[i].ctrl3 + "\n";
-                    content += "iPreampIn\t" + transaction.data[i].iPreampIn + "\n";
-                    content += "iPremapFeed\t" + transaction.data[i].iPremapFeed + "\n";
-                    content += "iPreampOut\t" + transaction.data[i].iPreampOut + "\n";
-                    content += "iShaper\t" + transaction.data[i].iShaper + "\n";
-                    content += "iShaperFeed\t" + transaction.data[i].iShaperFeed + "\n";
-                    content += "iComp\t" + transaction.data[i].iComp + "\n";
-                    content += "chipId0\t" + transaction.data[i].chipId0 + "\n";
-                    content += "chipId1\t" + transaction.data[i].chipId1 + "\n";
-                    content += "latency\t" + transaction.data[i].latency + "\n";
-                    content += "vthreshold1\t" + transaction.data[i].vthreshold1 + "\n";
-                    content += "vthreshold2\t" + transaction.data[i].vthreshold2 + "\n";
-                    content += "vcal\t" + transaction.data[i].vcal + "\n";
-                    content += "calphase\t" + transaction.data[i].calphase + "\n";
-                }
-            }
-
-            fs.writeFile(fileName, content, callback);
-        });
 
     });
 };
