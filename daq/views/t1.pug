@@ -38,7 +38,7 @@ block content
           .form-group
             label Interval
             input.form-control(type='number', v-model='interval', :disabled='running')
-          .form-group
+          .form-group(v-if='mode == 1')
             label Delay
             input.form-control(type='number', v-model='delay', :disabled='running')
         .box-footer

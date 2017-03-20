@@ -137,6 +137,7 @@ var appVue = new Vue({
           appVue.clkSourceSelected,
           (appVue.crcSuppress == true ? 1 : 0)
         ]);
+      $.notify('The parameters have been applied');
       this.system();
     },
     get: function() {
@@ -190,61 +191,62 @@ var appVue = new Vue({
         appVue.wbCounters[18].ack = data[35] >>> 0;
       });
       ipbus_blockRead(oh_counter_reg(84), 22, function(data) {
-          appVue.t1Counters[4].cnt = data[0] >>> 0;
-          appVue.t1Counters[5].cnt = data[1] >>> 0;
-          appVue.t1Counters[6].cnt = data[2] >>> 0;
-          appVue.t1Counters[7].cnt = data[3] >>> 0;
-          appVue.t1Counters[8].cnt = data[4] >>> 0;
-          appVue.t1Counters[9].cnt = data[5] >>> 0;
-          appVue.t1Counters[10].cnt = data[6] >>> 0;
-          appVue.t1Counters[11].cnt = data[7] >>> 0;
-          appVue.t1Counters[12].cnt = data[8] >>> 0;
-          appVue.t1Counters[13].cnt = data[9] >>> 0;
-          appVue.t1Counters[14].cnt = data[10] >>> 0;
-          appVue.t1Counters[15].cnt = data[11] >>> 0;
-          appVue.t1Counters[16].cnt = data[12] >>> 0;
-          appVue.t1Counters[17].cnt = data[13] >>> 0;
-          appVue.t1Counters[18].cnt = data[14] >>> 0;
-          appVue.t1Counters[19].cnt = data[15] >>> 0;
-          appVue.t1Counters[20].cnt = data[16] >>> 0;
-          appVue.t1Counters[21].cnt = data[17] >>> 0;
-          appVue.t1Counters[22].cnt = data[18] >>> 0;
-          appVue.t1Counters[23].cnt = data[19] >>> 0;
-          appVue.linkCounters[0].cnt = data[20] >>> 0;
-          appVue.linkCounters[1].cnt = data[21] >>> 0;
+        appVue.t1Counters[4].cnt = data[0] >>> 0;
+        appVue.t1Counters[5].cnt = data[1] >>> 0;
+        appVue.t1Counters[6].cnt = data[2] >>> 0;
+        appVue.t1Counters[7].cnt = data[3] >>> 0;
+        appVue.t1Counters[8].cnt = data[4] >>> 0;
+        appVue.t1Counters[9].cnt = data[5] >>> 0;
+        appVue.t1Counters[10].cnt = data[6] >>> 0;
+        appVue.t1Counters[11].cnt = data[7] >>> 0;
+        appVue.t1Counters[12].cnt = data[8] >>> 0;
+        appVue.t1Counters[13].cnt = data[9] >>> 0;
+        appVue.t1Counters[14].cnt = data[10] >>> 0;
+        appVue.t1Counters[15].cnt = data[11] >>> 0;
+        appVue.t1Counters[16].cnt = data[12] >>> 0;
+        appVue.t1Counters[17].cnt = data[13] >>> 0;
+        appVue.t1Counters[18].cnt = data[14] >>> 0;
+        appVue.t1Counters[19].cnt = data[15] >>> 0;
+        appVue.t1Counters[20].cnt = data[16] >>> 0;
+        appVue.t1Counters[21].cnt = data[17] >>> 0;
+        appVue.t1Counters[22].cnt = data[18] >>> 0;
+        appVue.t1Counters[23].cnt = data[19] >>> 0;
+        appVue.linkCounters[0].cnt = data[20] >>> 0;
+        appVue.linkCounters[1].cnt = data[21] >>> 0;
       });
       ipbus_blockRead(oh_counter_reg(107), 9, function(data) {
-          appVue.statRegs[1].data1 = data[0] >>> 0;
-          appVue.statRegs[2].data1 = data[1] >>> 0;
-          appVue.wbCounters[0].stb = data[2] >>> 0;
-          appVue.wbCounters[0].ack = data[3] >>> 0;
-          appVue.t1Counters[0].cnt = data[4] >>> 0;
-          appVue.t1Counters[1].cnt = data[5] >>> 0;
-          appVue.t1Counters[2].cnt = data[6] >>> 0;
-          appVue.t1Counters[3].cnt = data[7] >>> 0;
-          appVue.linkCounters[2].cnt = data[8] >>> 0;
-    });
-      ipbus_blockRead(oh_counter_reg(107), 2, function(data) {
+        appVue.statRegs[1].data1 = data[0] >>> 0;
+        appVue.statRegs[2].data1 = data[1] >>> 0;
+        appVue.wbCounters[0].stb = data[2] >>> 0;
+        appVue.wbCounters[0].ack = data[3] >>> 0;
+        appVue.t1Counters[0].cnt = data[4] >>> 0;
+        appVue.t1Counters[1].cnt = data[5] >>> 0;
+        appVue.t1Counters[2].cnt = data[6] >>> 0;
+        appVue.t1Counters[3].cnt = data[7] >>> 0;
+        appVue.linkCounters[2].cnt = data[8] >>> 0;
       });
     },
     resetStatCounters: function() {
       ipbus_blockWrite(oh_counter_reg(107), [0, 0]);
+      $.notify('The counters have been reset');
       this.get();
-
     },
     resetWishboneCounters: function() {
       ipbus_blockWrite(oh_counter_reg(0), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
       ipbus_blockWrite(oh_counter_reg(109), [0, 0]);
+      $.notify('The counters have been reset');
       this.get();
     },
     resetT1Counters: function() {
       ipbus_blockWrite(oh_counter_reg(84), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
       ipbus_blockWrite(oh_counter_reg(111), [0, 0, 0, 0]);
+      $.notify('The counters have been reset');
       this.get();
     },
     resetLinkCounters: function() {
       ipbus_blockWrite(oh_counter_reg(104), [0, 0]);
       ipbus_blockWrite(oh_counter_reg(112), 0);
+      $.notify('The counters have been reset');
       this.get();
     }
   }

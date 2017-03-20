@@ -108,14 +108,17 @@ var appVue = new Vue({
     },
     resetIpbusCounters: function() {
       ipbus_blockWrite(glib_counter_reg(0), [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      $.notify('The counters have been reset');
       this.get();
     },
     resetT1Counters: function() {
       ipbus_blockWrite(glib_counter_reg(10), [0, 0, 0, 0]);
+      $.notify('The counters have been reset');
       this.get();
     },
     resetGTXCounters: function() {
       ipbus_blockWrite(glib_counter_reg(14), [0, 0, 0, 0]);
+      $.notify('The counters have been reset');
       this.get();
     }
   }

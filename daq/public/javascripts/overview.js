@@ -66,14 +66,11 @@ var appVue = new Vue({
       ipbus_read(glib_counter_reg(18 + asideVue.optohybrid), function(data) {
         appVue.received = data;
       });
-      ipbus_write(oh_ei2c_reg(256), 0);
-      ipbus_read(oh_ei2c_reg(8));
-      ipbus_fifoRead(oh_ei2c_reg(257), 24, function(data) {
-        for (var i = 0; i < data.length; ++i) appVue.vfat2s[i].isPresent = ((data[i] >> 16) == 0x3 ? false : true);
-      });
-      ipbus_read(oh_ei2c_reg(0));
-      ipbus_fifoRead(oh_ei2c_reg(257), 24, function(data) {
-        for (var i = 0; i < data.length; ++i) appVue.vfat2s[i].isOn = (((data[i] & 0xF000000) >> 24) == 0x5 || (data[i] & 0x1) == 0 ? false : true);
+      ipbus_readI2C(0, 0, function(data) {
+        for (var i = 0; i < data.length; ++i) {
+          appVue.vfat2s[i].isPresent = ((data[i] >> 16) == 0x3 ? false : true);
+          appVue.vfat2s[i].isOn = (((data[i] & 0xF000000) >> 24) == 0x5 || (data[i] & 0x1) == 0 ? false : true);
+        }
       });
       ipbus_blockRead(oh_counter_reg(36), 48, function(data) {
         for (var i = 0; i < 24; ++i) {

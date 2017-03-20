@@ -23,8 +23,7 @@ var appVue = new Vue({
           dBad: 0
         })
       }
-      ipbus_read(oh_ei2c_reg(8));
-      ipbus_fifoRead(oh_ei2c_reg(257), 24, function(data) {
+      ipbus_readI2C(8, 0, function(data) {
         for (var i = 0; i < data.length; ++i) appVue.vfat2s[i].isPresent = ((data[i] >> 16) == 0x3 ? false : true);
       });
       ipbus_blockRead(oh_counter_reg(0), 166, function(data) {
