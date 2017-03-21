@@ -23,9 +23,7 @@ var appVue = new Vue({
           dBad: 0
         })
       }
-      ipbus_readI2C(8, 0, function(data) {
-        for (var i = 0; i < data.length; ++i) appVue.vfat2s[i].isPresent = ((data[i] >> 16) == 0x3 ? false : true);
-      });
+      for (var i = 0; i < 24; ++i) this.getVFAT2(i);
       ipbus_blockRead(oh_counter_reg(0), 166, function(data) {
         appVue.timestamp = data[117] >>> 0;
         for (var i = 0; i < 24; ++i) {
@@ -37,6 +35,11 @@ var appVue = new Vue({
       });
       this.chartTrigger = this.drawChart('#trigger', 'Rate [kHz]', 40000);
       this.chartTracking = this.drawChart('#tracking', 'Rate [Hz]', undefined);
+    },
+    getVFAT2: function(i) {
+      ipbus_read(vfat2_reg(i, 0), function(data) {
+        appVue.vfat2s[i].isPresent = (((data >> 24) & 0x7) != 0x3 ? false : true);
+      });
     },
     get: function() {
       ipbus_blockRead(oh_counter_reg(0), 166, function(data) {

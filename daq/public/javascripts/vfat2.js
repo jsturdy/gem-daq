@@ -48,16 +48,17 @@ var appVue = new Vue({
       this.get();
     },
     get: function() {
-      ipbus_readI2C(0, 0, function(data) {
-        for (var i = 0; i < data.length; ++i) {
-          appVue.vfat2s[i].isPresent = ((data[i] >> 16) == 0x3 ? false : true);
-          appVue.vfat2s[i].isOn = (((data[i] & 0xF000000) >> 24) == 0x5 || (data[i] & 0x1) == 0 ? false : true);
-        }
-      });
+      for (var i = 0; i < 24; ++i) this.getVFAT2Summary(i);
       ipbus_read(oh_system_reg(0), function(data) {
         for (var i = 0; i < 24; ++i) appVue.vfat2s[i].isMasked = (((data >> i) & 0x1) == 1 ? true : false);
       });
       if (this.selected != -1) this.getVFAT2(this.selected);
+    },
+    getVFAT2Summary: function(i) {
+      ipbus_read(vfat2_reg(i, 0), function(data) {
+        appVue.vfat2s[i].isPresent = (((data >> 24) & 0x7) != 0x3 ? false : true);
+        appVue.vfat2s[i].isOn = ((data & 0x1) == 0 ? false : true);
+      });
     },
     getVFAT2: function(vfat2) {
       ipbus_blockRead(vfat2_reg(vfat2, 0), 10, function(data) {
@@ -90,28 +91,31 @@ var appVue = new Vue({
       this.selected = vfat2;
     },
     applyDefaultsAll: function() {
-      ipbus_writeI2C(1, this.params.ctrl1, 0);
-      ipbus_writeI2C(2, this.params.iPreampIn, 0);
-      ipbus_writeI2C(3, this.params.iPremapFeed, 0);
-      ipbus_writeI2C(4, this.params.iPreampOut, 0);
-      ipbus_writeI2C(5, this.params.iShaper, 0);
-      ipbus_writeI2C(6, this.params.iShaperFeed, 0);
-      ipbus_writeI2C(7, this.params.iComp, 0);
-      ipbus_writeI2C(147, this.params.vthreshold2, 0);
-      ipbus_writeI2C(149, this.params.ctrl2, 0);
-      ipbus_writeI2C(150, this.params.ctrl3, 0);
+      this.writeToAll(1, this.params.ctrl1);
+      this.writeToAll(2, this.params.iPreampIn);
+      this.writeToAll(3, this.params.iPremapFeed);
+      this.writeToAll(4, this.params.iPreampOut);
+      this.writeToAll(5, this.params.iShaper);
+      this.writeToAll(6, this.params.iShaperFeed);
+      this.writeToAll(7, this.params.iComp);
+      this.writeToAll(147, this.params.vthreshold2);
+      this.writeToAll(149, this.params.ctrl2);
+      this.writeToAll(150, this.params.ctrl3);
       $.notify('Default settings applied to all VFAT2s');
       setTimeout(this.get, 100);
     },
     startAll: function() {
-      ipbus_writeI2C(0, this.params.ctrl0, 0);
+      this.writeToAll(0, this.params.ctrl0, 0);
       $.notify('All VFAT2s have been started');
       setTimeout(this.get, 100);
     },
     stopAll: function() {
-      ipbus_writeI2C(0, 0, 0);
+      this.writeToAll(0, 0, 0);
       $.notify('All VFAT2s have been stopped');
       setTimeout(this.get, 100);
+    },
+    writeToAll: function(reg, value) {
+      for (var i = 0; i < 24; ++i) ipbus_write(vfat2_reg(i, reg), value);
     },
     toggleMask: function() {
       ipbus_read(oh_system_reg(0), function(data) {

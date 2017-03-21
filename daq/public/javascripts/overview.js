@@ -57,21 +57,16 @@ var appVue = new Vue({
         var date = year + "." + month + "." + day
         appVue.systems[1].date = date;
       });
-      ipbus_blockRead(tkdata_reg(1), 3, function(data) {
-        appVue.available = Math.floor(data[0] / 7.);
+      ipbus_read(tkdata_reg(1), function(data) {
+        appVue.available = Math.floor(data >>> 0 / 7.);
       });
       ipbus_read(oh_counter_reg(106), function(data) {
-        appVue.sent = data;
+        appVue.sent = data >>> 0;
       });
       ipbus_read(glib_counter_reg(18 + asideVue.optohybrid), function(data) {
-        appVue.received = data;
+        appVue.received = data >>> 0;
       });
-      ipbus_readI2C(0, 0, function(data) {
-        for (var i = 0; i < data.length; ++i) {
-          appVue.vfat2s[i].isPresent = ((data[i] >> 16) == 0x3 ? false : true);
-          appVue.vfat2s[i].isOn = (((data[i] & 0xF000000) >> 24) == 0x5 || (data[i] & 0x1) == 0 ? false : true);
-        }
-      });
+      for (var i = 0; i < 24; ++i) this.getVFAT2(i);
       ipbus_blockRead(oh_counter_reg(36), 48, function(data) {
         for (var i = 0; i < 24; ++i) {
           appVue.vfat2s[i].good = data[i] >>> 0;
@@ -107,6 +102,12 @@ var appVue = new Vue({
           appVue.temperatureChart.data.datasets[2].data.shift();
         }
         appVue.temperatureChart.update();
+      });
+    },
+    getVFAT2: function(i) {
+      ipbus_read(vfat2_reg(i, 0), function(data) {
+        appVue.vfat2s[i].isPresent = (((data >> 24) & 0x7) != 0x3 ? false : true);
+        appVue.vfat2s[i].isOn = ((data & 0x1) == 0 ? false : true);
       });
     },
     drawTemperature: function() {

@@ -173,16 +173,13 @@ var appVue = new Vue({
         var nReads = 24 - popcount(mask);
         ipbus_write(oh_ei2c_reg(256), mask);
         ipbus_read(oh_ei2c_reg(this.register));
-        this.readResults(nReads);
+        setTimeout(function() { appVue.readResults(nReads); }, 300);
       }
     },
     readResults: function(nReads) {
-      ipbus_read(oh_ei2c_reg(259), function(data) {
-        if (data != 0) return appVue.readResults(nReads);
-        ipbus_fifoRead(oh_ei2c_reg(257), nReads, function(data) {
-          appVue.results = [ ];
-          for (var i = 0; i < data.length; ++i) appVue.results.push({ vfat2: ((data[i] >> 8) & 0xff), data: (data[i] & 0xff) });
-        });
+      ipbus_fifoRead(oh_ei2c_reg(257), nReads, function(data) {
+        appVue.results = [ ];
+        for (var i = 0; i < data.length; ++i) appVue.results.push({ vfat2: ((data[i] >> 8) & 0xff), data: (data[i] & 0xff) });
       });
     },
     write() {

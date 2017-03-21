@@ -52,7 +52,6 @@ module.exports = function(io) {
           infoCode: message[7] & 0xf,
           data: [ ]
       };
-      console.log(response);
       // Read
       if (response.type == 0 || response.type == 2) {
           if (response.size == 1) response.data = (message[8] << 24) | (message[9] << 16) | (message[10] << 8) | message[11];

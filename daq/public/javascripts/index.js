@@ -112,26 +112,6 @@ function popcount(n) {
     return popcnt;
 }
 
-function ipbus_writeI2C(reg, data, mask2, cb) {
-  var mask = parseInt(mask2, 16);
-  var nReads = 24 - popcount(mask);
-  ipbus_write(oh_ei2c_reg(256), mask);
-  ipbus_write(oh_ei2c_reg(reg), data);
-  setTimeout(function() {
-    ipbus_fifoRead(oh_ei2c_reg(257), nReads, cb);
-  }, 20);
-}
-
-function ipbus_readI2C(reg, mask2, cb) {
-  var mask = parseInt(mask2, 16);
-  var nReads = 24 - popcount(mask);
-  ipbus_write(oh_ei2c_reg(256), mask);
-  ipbus_read(oh_ei2c_reg(reg));
-  setTimeout(function() {
-    ipbus_fifoRead(oh_ei2c_reg(257), nReads, cb);
-  }, 20);
-}
-
 $.notifyDefaults({
 	type: 'success',
 	allow_dismiss: true,
