@@ -1,6 +1,9 @@
 # ignore everything
 *
 
+daq/data/*
+!daq/data/empty
+
 !*.xml
 
 # Don't ignore git settings

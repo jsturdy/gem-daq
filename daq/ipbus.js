@@ -2,6 +2,8 @@
  * Socket IO interface
  */
 
+const fs = require('fs');
+
 module.exports = function(io) {
 
     var fs = require('fs');
@@ -166,9 +168,28 @@ module.exports = function(io) {
       });
   }
 
-    io.on('connection', function (socket) {
+  io.on('connection', function (socket) {
 
-        socket.on('ipbus', function(transaction, callback) { ipbus(transaction, callback); });
+    var wstream = null;
 
+    socket.on('ipbus', function(transaction, callback) { ipbus(transaction, callback); });
+
+    socket.on('tkdata_init', function() {
+      const now = require('moment')();
+      const fileName = 'data/' + now.format('YY-MM-DD-HH-mm-ss') + '.txt';
+      wstream = fs.createWriteStream(fileName);
     });
+
+    socket.on('tkdata_stop', function() {
+      if (wstream !== null) wstream.end();
+      wstream = null;
+    });
+
+    socket.on('tkdata_write', function(data) {
+      if (wstream !== null) {
+        wstream.write(Buffer.from(data));
+      }
+    });
+
+  });
 };

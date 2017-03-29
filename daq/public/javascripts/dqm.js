@@ -7,6 +7,7 @@ var appVue = new Vue({
   el: 'section.content',
   data: {
     running: false,
+    saveToFile: false,
     acquired: 0,
     sent: 0,
     received: 0,
@@ -76,7 +77,7 @@ var appVue = new Vue({
     getData: function() {
       ipbus_read(tkdata_reg(1), function(data) {
         ipbus_fifoRead(tkdata_reg(0), (data > 100 ? 100 : data), function(data) {
-          if (data.length == 1) appVue.buffer.push(d);
+          if (data.length == 1) appVue.buffer.push(data);
           else {
             data.forEach(function(d) {
               appVue.buffer.push(d);
@@ -86,6 +87,7 @@ var appVue = new Vue({
       });
     },
     createEvent: function() {
+      //
       var packet0 = this.buffer.shift();
       if (((packet0 >> 28) & 0xf) != 0xA) return;
       var packet1 = this.buffer.shift();
@@ -106,7 +108,8 @@ var appVue = new Vue({
       var strips3 = (((0x0000ffff & packet4) << 16) | ((0xffff0000 & packet5) >> 16)) >>> 0;
       var crc = (0x0000ffff & packet5) >>> 0;
       if (this.events.length >= 20) this.events.shift();
-      this.events.push({
+      //
+      var data = {
         ohBC: ohBC,
         ohEC: ohEC,
         bc: bc,
@@ -118,7 +121,12 @@ var appVue = new Vue({
         strips2: strips2,
         strips3: strips3,
         crc: crc
-      });
+      };
+      this.events.push(data);
+      if (this.saveToFile) {
+        tkdata_write([ packet0, packet1, packet2, packet3, packet4, packet5, packet6 ]);
+      }
+      //
       appVue.chartBC.data.datasets[0].data[Math.round(bc / 100)]++;
       appVue.chartEC.data.datasets[0].data[Math.round(ec / 10)]++;
       appVue.chartFlags.data.datasets[0].data[flags]++;
@@ -134,9 +142,11 @@ var appVue = new Vue({
     },
     start: function() {
       this.running = true;
+      if (this.saveToFile) tkdata_init();
     },
     stop: function() {
       this.running = false;
+      if (this.saveToFile) tkdata_stop();
     },
     empty: function() {
       ipbus_write(tkdata_reg(asideVue.OptoHybrid), 0);
