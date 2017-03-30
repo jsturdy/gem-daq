@@ -22,5 +22,8 @@
     "node-sass-middleware": "0.9.8",
     "pug": "~2.0.0-beta6",
     "socket.io": "^1.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
   }
 }

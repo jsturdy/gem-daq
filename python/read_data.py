@@ -18,7 +18,9 @@ crcs = []
 
 while (True):
     packets = [0, 0, 0, 0, 0, 0, 0]
-    packets[0] = struct.unpack(">I", f.read(4))[0]
+    a = f.read(4)
+    if (len(a) < 4): break
+    packets[0] = struct.unpack(">I", a)[0]
     if (not packets[0]): break
     if (packets[0] & 0xF0000000 != 0xA0000000): continue
     if (packets[0] & 0xF000 != 0xC000): continue
@@ -47,7 +49,7 @@ while (True):
     chipIDs.append(chipID)
     crcs.append(crc)
 
-(fig, ((plt1, plt2, plt3), (plt4, plt5, plt6))) = plt.subplots(2, 3)    
+(fig, ((plt1, plt2, plt3), (plt4, plt5, plt6))) = plt.subplots(2, 3)
 
 plt1.hist(bcs)
 plt1.set_title("BC")

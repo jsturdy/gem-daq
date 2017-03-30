@@ -1,23 +1,24 @@
-//// Dependencies
+const express = require('express');
+const app = express();
+const server = require('http').createServer(app);
+const path = require('path');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const expressSession = require('express-session');
+const pug = require('pug');
+const helmet = require('helmet');
+const compression = require('compression');
+const socketio = require('socket.io')(server);
+const ipbus = require('./ipbus')(socketio);
 
-var express = require('express'); // Express framework
-var app = express(); // Application
-var server = require('http').createServer(app); // Web server
-var path = require('path');
-var logger = require('morgan'); // Logger
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var expressSession = require('express-session'); // Sessions
-var memoryStore = expressSession.MemoryStore;
-var pug = require('pug'); // Template engine
-var helmet = require('helmet'); // Security
-var compression = require('compression'); // Compresses response using gzip
-var socketio = require('socket.io')(server); // Socket.io
-var ipbus = require('./ipbus')(socketio); // Socket.io
+// Sessions
 
-var sessionStore = new memoryStore();
+const memoryStore = expressSession.MemoryStore;
 
-var session = expressSession({
+const sessionStore = new memoryStore();
+
+const session = expressSession({
   store: sessionStore,
   secret: 'SZH1GDhg5XuSVhSqDi2QuuYoRh1ieQDumKia6HYS',
   resave: false,
@@ -28,30 +29,37 @@ socketio.use(function(socket, next) {
   session(socket.request, socket.request.res, next);
 });
 
+// Templates
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-//// Middleware
+// Middleware
 
+app.use(helmet());
+app.use(compression());
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: false
-}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session);
 app.use(require('node-sass-middleware')({
   src: path.join(__dirname, 'public'),
   dest: path.join(__dirname, 'public'),
   indentedSyntax: true,
-  sourceMap: true
+  sourceMap: true,
 }));
-app.use(express.static(path.join(__dirname, 'public'), {
-  index: false
-}));
-app.use('/bower_components',  express.static(__dirname + '/bower_components'));
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
+app.use('/bower_components',  express.static(path.join(__dirname, 'bower_components')));
 
-//// Routes
+// Sockets
+socketio.on('connection', function (socket) {
+  socket.on('change', function(i) {
+    socket.request.session.optohybrid = i[0];
+    socket.request.session.ipbusBlock = i[1];
+    sessionStore.set(socket.request.session.uid, socket.request.session);
+  });
+});
 
 app.get('*', function(req, res, next) {
   req.session.uid = req.sessionID;
@@ -61,14 +69,9 @@ app.get('*', function(req, res, next) {
   else req.session.ipbusBlock = res.locals.ipbusBlock = false;
   next();
 })
-socketio.on('connection', function (socket) {
-  socket.on('change', function(i) {
-    socket.request.session.optohybrid = i[0];
-    socket.request.session.ipbusBlock = i[1];
-    sessionStore.set(socket.request.session.uid, socket.request.session);
-  });
+app.get('/', (req, res, next) => {
+  res.render('overview');
 });
-app.get('/', function(req, res) { res.render('overview'); });
 app.get('/GLIB', function(req, res) { res.render('glib'); });
 app.get('/OptoHybrid', function(req, res) { res.render('optohybrid'); });
 app.get([ '/VFAT2s', '/VFAT2s/:vfat2Id' ], function(req, res) { res.render('vfat2'); });
