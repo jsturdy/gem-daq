@@ -9,7 +9,7 @@ var appVue = new Vue({
   },
   methods: {
     init: function() {
-      for (var i = 0; i < 24; ++i) {
+      for (let i = 0; i < 24; ++i) {
         this.vfat2s.push({
           id: i,
           isPresent: false,
@@ -23,10 +23,12 @@ var appVue = new Vue({
           dBad: 0
         })
       }
-      for (var i = 0; i < 24; ++i) this.getVFAT2(i);
+      for (let i = 0; i < 24; ++i) {
+        this.getVFAT2(i);
+      }
       ipbus_blockRead(oh_counter_reg(0), 166, function(data) {
         appVue.timestamp = data[117] >>> 0;
-        for (var i = 0; i < 24; ++i) {
+        for (let i = 0; i < 24; ++i) {
           appVue.vfat2s[i].trigger = data[118 + i] >>> 0;
           appVue.vfat2s[i].tracking = data[142 + i] >>> 0;
           appVue.vfat2s[i].good = data[36 + i] >>> 0;
@@ -44,53 +46,63 @@ var appVue = new Vue({
     get: function() {
       ipbus_blockRead(oh_counter_reg(0), 166, function(data) {
         // Time
-        var current = (data[117] >>> 0);
-        var old = (appVue.timestamp >>> 0);
-        var pos = ((current - old) >>> 0);
-        var neg = ((0xFFFFFFFF - old + current) >>> 0);
-        appVue.delta = ((current < old) ? neg : pos);
-        appVue.timestamp = current;
-        for (var i = 0; i < 24; ++i) {
+        {
+          const current = (data[117] >>> 0);
+          const old = (appVue.timestamp >>> 0);
+          const pos = ((current - old) >>> 0);
+          const neg = ((0xFFFFFFFF - old + current) >>> 0);
+          appVue.delta = ((current < old) ? neg : pos);
+          appVue.timestamp = current;
+        }
+        for (let i = 0; i < 24; ++i) {
           if (!appVue.vfat2s[i].isPresent) continue;
           // Trigger
-          var current = (data[118 + i] >>> 0);
-          var old = (appVue.vfat2s[i].trigger >>> 0);
-          var pos = ((current - old) >>> 0);
-          var neg = ((0xFFFFFFFF - old + current) >>> 0);
-          var update = (((current < old) ? neg : pos) / appVue.delta * 40000).toFixed(2);
-          appVue.vfat2s[i].trigger = current;
-          appVue.vfat2s[i].dTrigger = update;
-          appVue.chartTrigger.data.datasets[i].data.push(update);
+          {
+            const current = (data[118 + i] >>> 0);
+            const old = (appVue.vfat2s[i].trigger >>> 0);
+            const pos = ((current - old) >>> 0);
+            const neg = ((0xFFFFFFFF - old + current) >>> 0);
+            const update = (((current < old) ? neg : pos) / appVue.delta * 40000).toFixed(2);
+            appVue.vfat2s[i].trigger = current;
+            appVue.vfat2s[i].dTrigger = update;
+            appVue.chartTrigger.data.datasets[i].data.push(update);
+          }
           // Trigger
-          var current = (data[142 + i] >>> 0);
-          var old = (appVue.vfat2s[i].tracking >>> 0);
-          var pos = ((current - old) >>> 0);
-          var neg = ((0xFFFFFFFF - old + current) >>> 0);
-          var update = (((current < old) ? neg : pos) / appVue.delta * 40000000).toFixed(2);
-          appVue.vfat2s[i].tracking = current;
-          appVue.vfat2s[i].dTracking = update;
-          appVue.chartTracking.data.datasets[i].data.push(update);
+          {
+            const current = (data[142 + i] >>> 0);
+            const old = (appVue.vfat2s[i].tracking >>> 0);
+            const pos = ((current - old) >>> 0);
+            const neg = ((0xFFFFFFFF - old + current) >>> 0);
+            const update = (((current < old) ? neg : pos) / appVue.delta * 40000000).toFixed(2);
+            appVue.vfat2s[i].tracking = current;
+            appVue.vfat2s[i].dTracking = update;
+            appVue.chartTracking.data.datasets[i].data.push(update);
+          }
           // Good TK
-          var current = (data[36 + i] >>> 0);
-          var old = (appVue.vfat2s[i].good >>> 0);
-          var pos = ((current - old) >>> 0);
-          var neg = ((0xFFFFFFFF - old + current) >>> 0);
-          var update = (((current < old) ? neg : pos) / appVue.delta * 40000000).toFixed(2);
-          appVue.vfat2s[i].good = current;
-          appVue.vfat2s[i].dGood = update;
+          {
+            const current = (data[36 + i] >>> 0);
+            const old = (appVue.vfat2s[i].good >>> 0);
+            const pos = ((current - old) >>> 0);
+            const neg = ((0xFFFFFFFF - old + current) >>> 0);
+            const update = (((current < old) ? neg : pos) / appVue.delta * 40000000).toFixed(2);
+            appVue.vfat2s[i].good = current;
+            appVue.vfat2s[i].dGood = update;
+          }
           // Bad TK
-          var current = (data[60 + i] >>> 0);
-          var old = (appVue.vfat2s[i].bad >>> 0);
-          var pos = ((current - old) >>> 0);
-          var neg = ((0xFFFFFFFF - old + current) >>> 0);
-          var update = (((current < old) ? neg : pos) / appVue.delta * 40000000).toFixed(2);
-          appVue.vfat2s[i].bad = current;
-          appVue.vfat2s[i].dBad = update;
+          {
+            const current = (data[60 + i] >>> 0);
+            const old = (appVue.vfat2s[i].bad >>> 0);
+            const pos = ((current - old) >>> 0);
+            const neg = ((0xFFFFFFFF - old + current) >>> 0);
+            const update = (((current < old) ? neg : pos) / appVue.delta * 40000000).toFixed(2);
+            appVue.vfat2s[i].bad = current;
+            appVue.vfat2s[i].dBad = update;
+          }
         }
         if (appVue.chartTrigger.data.labels.length > 40) {
           appVue.chartTrigger.data.labels.shift();
           appVue.chartTracking.data.labels.shift();
-          for (var i = 0; i < 24; ++i) {
+          for (let i = 0; i < 24; ++i) {
             appVue.chartTrigger.data.datasets[i].data.shift();
             appVue.chartTracking.data.datasets[i].data.shift();
           }
@@ -102,9 +114,9 @@ var appVue = new Vue({
       });
     },
     drawChart: function(el, legend, max) {
-      var width = $(el).parent().width() - 40;
-      var height = Math.max(300, 0.3 * width);
-      var canvas = $(el).attr('width', width).attr('height', height);
+      const width = $(el).parent().width() - 40;
+      const height = Math.max(300, 0.3 * width);
+      const canvas = $(el).attr('width', width).attr('height', height);
       return new Chart(canvas, {
         type: 'line',
         data: {

@@ -20,9 +20,8 @@ var appVue = new Vue({
     init: function() {
       ipbus_blockRead(oh_ultra_reg(1), 7, function(data) {
         appVue.type = data[0];
-        var mask = data[1].toString(16).toUpperCase();
-        if (mask.length == 6) appVue.mask = mask;
-        else appVue.mask = Array(6 - mask.length + 1).join('0') + mask;
+        const mask = data[1].toString(16).toUpperCase();
+        appVue.mask = (mask.length == 6 ? mask : Array(6 - mask.length + 1).join('0') + mask);
         appVue.channel = data[2];
         appVue.min = data[3];
         appVue.max = data[4];
@@ -41,18 +40,22 @@ var appVue = new Vue({
         appVue.error = (((data >> 4) & 0x1) != 0);
         appVue.ready = (((data >> 5) & 0x1) != 0);
         appVue.masked = ((data >> 8) & 0xffffff);
-        if (!appVue.running && appVue.ready) appVue.read();
+        if (!appVue.running && appVue.ready) {
+          appVue.read();
+        }
       });
       ipbus_read(oh_counter_reg(100), function(data) {
-        if (appVue.running)  appVue.progress = (data - appVue.seen) / ((appVue.max - appVue.min + 1) * appVue.events) * 100;
-        else appVue.progress = 0;
+        appVue.progress = (appVue.running ? 0 : ((data - appVue.seen) / ((appVue.max - appVue.min + 1) * appVue.events) * 100));
       });
     },
     launch: function() {
-      if (this.running) return;
-      if (this.max == 0) this.max = 255;
-      if (this.step == 0) this.step = 1;
-      if (this.events == 0) this.events = 0xFFFFFF;
+      if (this.running) {
+        return;
+      }
+      this.max = (this.max == 0 ? 255 : this.max);
+      this.min = (this.min == 0 ? 0 : this.min);
+      this.step = (this.step == 0 ? 1 : this.step);
+      this.events = (this.events == 0 ? 1000 : this.events);
       ipbus_blockWrite(oh_ultra_reg(1), [ this.type, parseInt(this.mask, 16), this.channel, this.min, this.max, this.step, this.events ]);
       ipbus_write(oh_ultra_reg(0), 1);
       ipbus_read(oh_counter_reg(100), function(data) {
@@ -66,34 +69,39 @@ var appVue = new Vue({
     },
     read: function() {
       this.ready = false;
-      var first = true;
+      let first = true;
       this.chart.data.labels = [ ];
-      for (var i = 0; i < 24; ++i) {
+      for (let i = 0; i < 24; ++i) {
         this.chart.data.datasets[i].data = [ ];
-        if (((this.masked >> i) & 0x1) == 1) continue;
+        if (((this.masked >> i) & 0x1) == 1) {
+          continue;
+        }
         this.update(i, first);
         first = false;
       }
     },
     update: function(i, labels) {
-      ipbus_fifoRead(oh_ultra_reg(8 + i), (this.max - this.min - 1), function(data) {
-        for (var j = 0; j < data.length; ++j) {
-          if (labels) appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
-          appVue.chart.data.datasets[i].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
-        }
-      });
-      ipbus_fifoRead(oh_ultra_reg(8 + i), 2, function(data) {
-        for (var j = 0; j < data.length; ++j) {
-          if (labels) appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
-          appVue.chart.data.datasets[i].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
-        }
-        appVue.chart.update();
-      });
+      let n = Math.ceil((this.max - this.min + 1) / this.step);
+      while (n > 0) {
+        ipbus_fifoRead(oh_ultra_reg(8 + i), (n > 100 ? 100 : n), function(data) {
+          if (data.length === undefined) {
+            data = [ data ];
+          }
+          for (let j = 0; j < data.length; ++j) {
+            if (labels === true) {
+              appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
+            }
+            appVue.chart.data.datasets[i].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
+          }
+          appVue.chart.update();
+        });
+        n -= 100;
+      }
     },
     drawChart: function() {
-      var width = $('#results').parent().width() - 40;
-      var height = Math.max(300, 0.3 * width);
-      var canvas = $('#results').attr('width', width).attr('height', height);
+      const width = $('#results').parent().width() - 40;
+      const height = Math.max(300, 0.3 * width);
+      const canvas = $('#results').attr('width', width).attr('height', height);
       this.chart = new Chart(canvas, {
         type: 'line',
         data: {

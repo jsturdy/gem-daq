@@ -37,18 +37,22 @@ var appVue = new Vue({
         appVue.running = ((data & 0xf) != 0);
         appVue.error = (((data >> 4) & 0x1) != 0);
         appVue.ready = (((data >> 5) & 0x1) != 0);
-        if (!appVue.running && appVue.ready) appVue.read();
+        if (!appVue.running && appVue.ready) {
+          appVue.read();
+        }
       });
       ipbus_read(oh_counter_reg(100), function(data) {
-        if (appVue.running)  appVue.progress = (data - appVue.seen) / ((appVue.max - appVue.min + 1) * appVue.events) * 100;
-        else appVue.progress = 0;
+        appVue.progress = (appVue.running ? 0 : ((data - appVue.seen) / ((appVue.max - appVue.min + 1) * appVue.events) * 100));
       });
     },
     launch: function() {
-      if (this.running) return;
-      if (this.max == 0) this.max = 255;
-      if (this.step == 0) this.step = 1;
-      if (this.events == 0) this.events = 0xFFFFFF;
+      if (this.running) {
+        return;
+      }
+      this.max = (this.max == 0 ? 255 : this.max);
+      this.min = (this.min == 0 ? 0 : this.min);
+      this.step = (this.step == 0 ? 1 : this.step);
+      this.events = (this.events == 0 ? 1000 : this.events);
       ipbus_blockWrite(oh_scan_reg(1), [ this.type, this.vfat2, this.channel, this.min, this.max, this.step, this.events ]);
       ipbus_write(oh_scan_reg(0), 1);
       ipbus_read(oh_counter_reg(100), function(data) {
@@ -67,24 +71,25 @@ var appVue = new Vue({
     update: function() {
       this.chart.data.labels = [ ];
       this.chart.data.datasets[0].data = [ ];
-      ipbus_fifoRead(oh_scan_reg(8), (this.max - this.min - 1), function(data) {
-        for (var j = 0; j < data.length; ++j) {
-          appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
-          appVue.chart.data.datasets[0].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
-        }
-      });
-      ipbus_fifoRead(oh_scan_reg(8), 2, function(data) {
-        for (var j = 0; j < data.length; ++j) {
-          appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
-          appVue.chart.data.datasets[0].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
-        }
-        appVue.chart.update();
-      });
+      let n = Math.ceil((this.max - this.min + 1) / this.step);
+      while (n > 0) {
+        ipbus_fifoRead(oh_scan_reg(8), (n > 100 ? 100 : n), function(data) {
+          if (data.length === undefined) {
+            data = [ data ];
+          }
+          for (let j = 0; j < data.length; ++j) {
+            appVue.chart.data.labels.push((data[j] >> 24) & 0xFF);
+            appVue.chart.data.datasets[0].data.push((data[j] & 0x00FFFFFF) / (1. * appVue.events) * 100);
+          }
+          appVue.chart.update();
+        });
+        n -= 100;
+      }
     },
     drawChart: function() {
-      var width = $('#results').parent().width() - 40;
-      var height = Math.max(200, 0.3 * width);
-      var canvas = $('#results').attr('width', width).attr('height', height);
+      const width = $('#results').parent().width() - 40;
+      const height = Math.max(200, 0.3 * width);
+      const canvas = $('#results').attr('width', width).attr('height', height);
       this.chart = new Chart(canvas, {
         type: 'line',
         data: {

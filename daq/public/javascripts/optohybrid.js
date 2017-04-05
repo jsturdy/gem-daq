@@ -96,14 +96,12 @@ var appVue = new Vue({
     },
     system: function() {
       ipbus_blockRead(oh_system_reg(0), 11, function(data) {
-        var mask = data[0].toString(16).toUpperCase();
-        if (mask.length == 6) appVue.trackingMask = mask;
-        else appVue.trackingMask = Array(6 - mask.length + 1).join('0') + mask;
+        const mask = data[0].toString(16).toUpperCase();
+        appVue.trackingMask = (mask.length == 6 ? mask : Array(6 - mask.length + 1).join('0') + mask);
         appVue.t1SourceSelected = data[1];
         appVue.loopbackSource = data[2];
-        var mask2 = data[4].toString(16).toUpperCase();
-        if (mask2.length == 6) appVue.triggerMask = mask2;
-        else appVue.triggerMask = Array(6 - mask2.length + 1).join('0') + mask2;
+        const mask2 = data[4].toString(16).toUpperCase();
+        appVue.triggerMask = (mask2.length == 6 ? mask2 : Array(6 - mask2.length + 1).join('0') + mask2);
         appVue.sbitSelect[0] = data[5] & 0x1F;
         appVue.sbitSelect[1] = (data[5] >> 5) & 0x1F;
         appVue.sbitSelect[2] = (data[5] >> 10) & 0x1F;
@@ -142,12 +140,12 @@ var appVue = new Vue({
     },
     get: function() {
       ipbus_blockRead(oh_stat_reg(0), 4, function(data) {
-        var year = ((data[0] >> 16) & 0xffff).toString(16);
-        var month = ((data[0] >> 8) & 0xff).toString(16);
-        var day = (data[0] & 0xff).toString(16);
-        var date = year + "." + month + "." + day
+        const year = ((data[0] >> 16) & 0xffff).toString(16);
+        const month = ((data[0] >> 8) & 0xff).toString(16);
+        const day = (data[0] & 0xff).toString(16);
+        const date = year + "." + month + "." + day
         appVue.statRegs[0].data1 = date;
-        var version = ((data[3] >> 24) & 0xff).toString(16) + "." + ((data[3] >> 16) & 0xff).toString(16) + "." + ((data[3] >> 8) & 0xff).toString(16) + "." + (data[3] & 0xff).toString(16);
+        const version = ((data[3] >> 24) & 0xff).toString(16) + "." + ((data[3] >> 16) & 0xff).toString(16) + "." + ((data[3] >> 8) & 0xff).toString(16) + "." + (data[3] & 0xff).toString(16);
         appVue.statRegs[0].data0 = version;
         appVue.statRegs[1].data0 = data[1];
         appVue.statRegs[2].data0 = data[2];

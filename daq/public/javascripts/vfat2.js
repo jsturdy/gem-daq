@@ -19,7 +19,7 @@ var appVue = new Vue({
   },
   methods: {
     init: function() {
-      for (var i = 0; i < 24; ++i) {
+      for (let i = 0; i < 24; ++i) {
         this.vfat2s.push({
           id: i,
           isPresent: false,
@@ -48,11 +48,17 @@ var appVue = new Vue({
       this.get();
     },
     get: function() {
-      for (var i = 0; i < 24; ++i) this.getVFAT2Summary(i);
+      for (let i = 0; i < 24; ++i) {
+        this.getVFAT2Summary(i);
+      }
       ipbus_read(oh_system_reg(0), function(data) {
-        for (var i = 0; i < 24; ++i) appVue.vfat2s[i].isMasked = (((data >> i) & 0x1) == 1 ? true : false);
+        for (let i = 0; i < 24; ++i) {
+          appVue.vfat2s[i].isMasked = (((data >> i) & 0x1) == 1 ? true : false);
+        }
       });
-      if (this.selected != -1) this.getVFAT2(this.selected);
+      if (this.selected != -1) {
+        this.getVFAT2(this.selected);
+      }
     },
     getVFAT2Summary: function(i) {
       ipbus_read(vfat2_reg(i, 0), function(data) {

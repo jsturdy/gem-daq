@@ -27,7 +27,7 @@ var appVue = new Vue({
   },
   methods: {
     init: function() {
-      for (var i = 0; i < 24; ++i) {
+      for (let i = 0; i < 24; ++i) {
         this.vfat2s.push({
           id: i,
           isPresent: false,
@@ -41,20 +41,20 @@ var appVue = new Vue({
     },
     get: function() {
       ipbus_read(0x00000002, function(data) {
-        var version = ((data >> 28) & 0xf) + "." + ((data >> 24) & 0xf) + "." + ((data >> 16) & 0xff);
-        var date = (2000 + ((data >> 9) & 0x7f)) + "." + ((data >> 5) & 0xf) + "." + (data & 0x1f);
+        const version = ((data >> 28) & 0xf) + "." + ((data >> 24) & 0xf) + "." + ((data >> 16) & 0xff);
+        const date = (2000 + ((data >> 9) & 0x7f)) + "." + ((data >> 5) & 0xf) + "." + (data & 0x1f);
         appVue.systems[0].version = version;
         appVue.systems[0].date = date;
       });
       ipbus_read(oh_stat_reg(3), function(data) {
-        var version = ((data >> 24) & 0xff).toString(16) + "." + ((data >> 16) & 0xff).toString(16) + "." + ((data >> 8) & 0xff).toString(16) + "." + (data & 0xff).toString(16);
+        const version = ((data >> 24) & 0xff).toString(16) + "." + ((data >> 16) & 0xff).toString(16) + "." + ((data >> 8) & 0xff).toString(16) + "." + (data & 0xff).toString(16);
         appVue.systems[1].version = version;
       });
       ipbus_read(oh_stat_reg(0), function(data) {
-        var year = ((data >> 16) & 0xffff).toString(16);
-        var month = ((data >> 8) & 0xff).toString(16);
-        var day = (data & 0xff).toString(16);
-        var date = year + "." + month + "." + day
+        const year = ((data >> 16) & 0xffff).toString(16);
+        const month = ((data >> 8) & 0xff).toString(16);
+        const day = (data & 0xff).toString(16);
+        const date = year + "." + month + "." + day
         appVue.systems[1].date = date;
       });
       ipbus_read(tkdata_reg(1), function(data) {
@@ -66,9 +66,9 @@ var appVue = new Vue({
       ipbus_read(glib_counter_reg(18 + asideVue.optohybrid), function(data) {
         appVue.received = data >>> 0;
       });
-      for (var i = 0; i < 24; ++i) this.getVFAT2(i);
+      for (let i = 0; i < 24; ++i) this.getVFAT2(i);
       ipbus_blockRead(oh_counter_reg(36), 48, function(data) {
-        for (var i = 0; i < 24; ++i) {
+        for (let i = 0; i < 24; ++i) {
           appVue.vfat2s[i].good = data[i] >>> 0;
           appVue.vfat2s[i].bad = data[24 + i] >>> 0;
         }
@@ -111,9 +111,9 @@ var appVue = new Vue({
       });
     },
     drawTemperature: function() {
-      var width = $('#temperature').parent().width() - 40;
-      var height = Math.max(250, 0.3 * width);
-      var canvas = $('#temperature').attr('width', width).attr('height', height);
+      const width = $('#temperature').parent().width() - 40;
+      const height = Math.max(250, 0.3 * width);
+      const canvas = $('#temperature').attr('width', width).attr('height', height);
       this.temperatureChart = new Chart(canvas, {
         type: 'line',
         data: {

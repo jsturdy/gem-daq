@@ -48,13 +48,21 @@ var appVue = new Vue({
     read: function() {
       ipbus_read(oh_adc_reg(this.register), function(data) {
         // Temperature
-        if (appVue.register == 0 || appVue.register == 32 || appVue.register == 36) appVue.result = Math.round(((data >> 6) * 503.975 / 1024. - 273.15) * 100.) / 100. +  " °C";
+        if (appVue.register == 0 || appVue.register == 32 || appVue.register == 36) {
+          appVue.result = Math.round(((data >> 6) * 503.975 / 1024. - 273.15) * 100.) / 100. +  " °C";
+        }
         // Vccint, Vccaux
-        else if (appVue.register == 1 || appVue.register == 2 || appVue.register == 33 || appVue.register == 34 || appVue.register == 37 || appVue.register == 38) appVue.result = Math.round((data >> 6) / 1024. * 3. * 100.) / 100. +  " V";
+        else if (appVue.register == 1 || appVue.register == 2 || appVue.register == 33 || appVue.register == 34 || appVue.register == 37 || appVue.register == 38) {
+          appVue.result = Math.round((data >> 6) / 1024. * 3. * 100.) / 100. +  " V";
+        }
         // Control
-        else if (appVue.register >= 64) appVue.result = data & 0xffff;
+        else if (appVue.register >= 64) {
+          appVue.result = data & 0xffff;
+        }
         // Other
-        else appVue.result = Math.round((data >> 6) / 1024. * 100. * 100.) / 100. + " mV";
+        else {
+          appVue.result = Math.round((data >> 6) / 1024. * 100. * 100.) / 100. + " mV";
+        }
       });
     },
     write: function() {
@@ -63,9 +71,9 @@ var appVue = new Vue({
       this.result = null;
     },
     drawTemperature: function() {
-      var width = $('#temperature').parent().width() - 40;
-      var height = Math.max(250, 0.3 * width);
-      var canvas = $('#temperature').attr('width', width).attr('height', height);
+      const width = $('#temperature').parent().width() - 40;
+      const height = Math.max(250, 0.3 * width);
+      const canvas = $('#temperature').attr('width', width).attr('height', height);
       this.temperatureChart = new Chart(canvas, {
         type: 'line',
         data: {
@@ -93,9 +101,9 @@ var appVue = new Vue({
       });
     },
     drawVoltage: function() {
-      var width = $('#voltage').parent().width() - 40;
-      var height = Math.max(300, 0.3 * width);
-      var canvas = $('#voltage').attr('width', width).attr('height', height);
+      const width = $('#voltage').parent().width() - 40;
+      const height = Math.max(300, 0.3 * width);
+      const canvas = $('#voltage').attr('width', width).attr('height', height);
       this.voltageChart = new Chart(canvas, {
         type: 'line',
         data: {
