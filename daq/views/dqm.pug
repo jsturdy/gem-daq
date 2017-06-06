@@ -13,6 +13,9 @@ block content
       .box.box-widget
         .box-header: h3.box-title Readout Control
         .box-body
+          p.checkbox.checkbox-info
+            input(type='checkbox', v-model='saveToFile', :disabled='running')
+            label Save the data to disk
           a.btn.bg-olive.btn-flat(v-on:click='start', :disabled='running') Start acquisition
           a.btn.bg-maroon.btn-flat(v-on:click='stop', :disabled='!running') Stop acquisition
       //- Statistics

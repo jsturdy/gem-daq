@@ -84,6 +84,18 @@ function ipbus_fifoWrite(addr, data, clientCallback) {
   });
 }
 
+function tkdata_init() {
+  socket.emit('tkdata_init');
+}
+
+function tkdata_stop() {
+  socket.emit('tkdata_stop');
+}
+
+function tkdata_write(data) {
+  socket.emit('tkdata_write', data);
+}
+
 function vfat2_reg(vfat2, reg) { return 0x40000000 + ((asideVue.optohybrid & 0xf) << 20) + ((vfat2 & 0xff) << 8) + (reg & 0xff); }
 
 function oh_ei2c_reg(reg) { return 0x41000000 + ((asideVue.optohybrid & 0xf) << 20) + (reg & 0xfff); }
@@ -111,3 +123,10 @@ function popcount(n) {
     for (var popcnt = 0; n; n &= n - 1) ++popcnt;
     return popcnt;
 }
+
+$.notifyDefaults({
+	type: 'success',
+	allow_dismiss: true,
+  newest_on_top: true,
+  delay: 1000,
+});

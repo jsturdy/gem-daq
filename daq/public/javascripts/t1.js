@@ -29,12 +29,13 @@ var appVue = new Vue({
         appVue.running = (data == 0 ? false : true);
       });
       ipbus_read(oh_counter_reg(100), function(data) {
-        if (appVue.running && appVue.events != 0)  appVue.progress = (data - appVue.seen) / (appVue.events) * 100;
-        else appVue.progress = 0;
+        appVue.progress = (appVue.running && appVue.events != 0 ? ((data - appVue.seen) / (appVue.events) * 100) : 0);
       });
     },
     start: function() {
-      if (this.running) return;
+      if (this.running) {
+        return;
+      }
       ipbus_blockWrite(oh_t1_reg(1), [ this.mode, this.type, this.events, this.interval, this.delay ]);
       ipbus_write(oh_t1_reg(0), 1);
       ipbus_read(oh_counter_reg(100), function(data) {
@@ -43,7 +44,9 @@ var appVue = new Vue({
       this.get();
     },
     stop: function() {
-      if (!this.running) return;
+      if (!this.running) {
+        return;
+      }
       ipbus_write(oh_t1_reg(0), 0);
       this.get();
     },

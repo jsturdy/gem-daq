@@ -169,26 +169,27 @@ var appVue = new Vue({
         });
       }
       else {
-        var mask = parseInt(this.mask, 16);
-        var nReads = 24 - popcount(mask);
+        const mask = parseInt(this.mask, 16);
+        const nReads = 24 - popcount(mask);
         ipbus_write(oh_ei2c_reg(256), mask);
         ipbus_read(oh_ei2c_reg(this.register));
-        this.readResults(nReads);
+        setTimeout(function() { appVue.readResults(nReads); }, 300);
       }
     },
     readResults: function(nReads) {
-      ipbus_read(oh_ei2c_reg(259), function(data) {
-        if (data != 0) return appVue.readResults(nReads);
-        ipbus_fifoRead(oh_ei2c_reg(257), nReads, function(data) {
-          appVue.results = [ ];
-          for (var i = 0; i < data.length; ++i) appVue.results.push({ vfat2: ((data[i] >> 8) & 0xff), data: (data[i] & 0xff) });
-        });
+      ipbus_fifoRead(oh_ei2c_reg(257), nReads, function(data) {
+        appVue.results = [ ];
+        for (let i = 0; i < data.length; ++i) {
+          appVue.results.push({ vfat2: ((data[i] >> 8) & 0xff), data: (data[i] & 0xff) });
+        }
       });
     },
     write() {
-      if (this.type == 0) ipbus_write(vfat2_reg(this.vfat2, this.register), this.writeData);
+      if (this.type == 0) {
+        ipbus_write(vfat2_reg(this.vfat2, this.register), this.writeData);
+      }
       else {
-        var mask = parseInt(this.mask, 16);
+        const mask = parseInt(this.mask, 16);
         ipbus_write(oh_ei2c_reg(256), mask);
         ipbus_write(oh_ei2c_reg(this.register), this.writeData);
       }

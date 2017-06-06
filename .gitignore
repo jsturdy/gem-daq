@@ -1,6 +1,8 @@
 # ignore everything
 *
 
+!*.xml
+
 # Don't ignore git settings
 !*.gitignore
 !*.gitattributes
